@@ -15,10 +15,17 @@ import org.w3c.dom.NodeList;
 
 public class App {
 
-    private static final String readFileName = "C:/old cncm/cncm.prm.xml";
-    private static final String writeFileName = "C:/cncm/cncm.prm.xml";
+    private static final String oldParmFile = "C:/old cncm/cncm.prm.xml";
+    private static final String newParmFile = "C:/cncm/cncm.prm.xml";
+    private static final String oldCfgFile = "C:/old cncm/cncmcfg.xml";
+    private static final String newCfgFile = "C:/cncm/cncmcfg.xml";
+    private static final String oldWizardSettingsFile = "C:/old cncm/wizardsettings.xml";
+    private static final String newWizardSettingsFile = "C:/cncm/wizardsettings.xml";
     public static ArrayList<String> paramValues = new ArrayList<>();
     public static ArrayList<Integer> paramsToCheck = new ArrayList<>();
+    public static String board;
+    public static String versionRaw;
+    public static int versionCombined;
     public static void main(String[] args) throws Exception {
         paramsToCheck.add(700);
         paramsToCheck.add(710);
@@ -33,34 +40,71 @@ public class App {
         //2. Document builder
         DocumentBuilder builder = factory.newDocumentBuilder();
         //3. Parse the xml document
-        Document readDocument = builder.parse(new File(readFileName));
-        Document writeDocument = builder.parse(new File(writeFileName));
+        Document oldParmDocument = builder.parse(new File(oldParmFile));
+        Document newParmDocument = builder.parse(new File(newParmFile));
+
+        Document oldCfgDocument = builder.parse(new File(oldCfgFile));
+        Document newCfgDocument = builder.parse(new File(newCfgFile));
+
+        Document oldWizardSettingsDocument = builder.parse(new File(oldWizardSettingsFile));
+        Document newWizardSettingsDocument = builder.parse(new File(newWizardSettingsFile));
+
         //4. Get root element
-        Element readRootElement = readDocument.getDocumentElement();
-        Element writeRootElement = writeDocument.getDocumentElement();
-        //5. Get node list
-        String tagName = "value";
-        NodeList readNodeList = readRootElement.getElementsByTagName(tagName);
-        NodeList writeNodeList = writeRootElement.getElementsByTagName(tagName);
-        //6. Iterate through node list and get elements and attributes
-        for(int i = 0; i < readNodeList.getLength(); i ++) {
-            Node readNode = readNodeList.item(i);
-            Node writeNode = writeNodeList.item(i);
-            Element element = (Element) readNode;
-            String index = element.getAttribute("index");
-            String text = element.getTextContent();
-            if (paramsToCheck.contains(i)) {
-                writeNode.setTextContent("69");
-            }
+        Element oldParmRootElement = oldParmDocument.getDocumentElement();
+        Element newParmRootElement = newParmDocument.getDocumentElement();
+
+        Element oldCfgRootElement = oldCfgDocument.getDocumentElement();
+        Element newCfgRootElement = newCfgDocument.getDocumentElement();
+
+        Element oldWizardSettingsRootElement = oldWizardSettingsDocument.getDocumentElement();
+        Element newWizardSettingsRootElement = newWizardSettingsDocument.getDocumentElement();
+
+        //Get board and software version
+        NodeList softwareVersionNodeList = oldParmRootElement.getElementsByTagName("SoftwareVersion");
+        String softwareVersion = softwareVersionNodeList.item(0).getTextContent();
+        String[] softwareVersionSplit = softwareVersion.split(" ");
+        board = softwareVersionSplit[0];
+        versionRaw = softwareVersionSplit[3];
+        String[] versionSplitSplit = versionRaw.split("\\.");
+        if (versionSplitSplit.length == 2) {
+            versionCombined = Integer.parseInt(versionSplitSplit[0]) * Integer.parseInt(versionSplitSplit[1]);
+        } else {
+            versionCombined = Integer.parseInt(versionSplitSplit[0]) * Integer.parseInt(versionSplitSplit[1]) + Integer.parseInt(versionSplitSplit[2]);
         }
-        System.out.println("Param values set");
-        //Write to the new xml file
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(writeDocument);
-        StreamResult result = new StreamResult(new File(writeFileName));
-        transformer.transform(source, result);
-        System.out.println("Param values written");
+
+        // //5. Get node list
+        // NodeList oldParmNodeList = oldParmRootElement.getElementsByTagName("value");
+        // NodeList newParmNodeList = newParmRootElement.getElementsByTagName("value");
+        // //6. Iterate through node list and get elements and attributes
+        // for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
+        //     Node oldParmNode = oldParmNodeList.item(i);
+        //     Node newParmNode = newParmNodeList.item(i);
+        //     Element element = (Element) oldParmNode;
+        //     String index = element.getAttribute("index");
+        //     String text = element.getTextContent();
+        //     if (paramsToCheck.contains(i)) {
+        //         newParmNode.setTextContent("69");//replace 69 with text after testing
+        //     }
+        // }
+        // System.out.println("Param values set");
+
+        // //Write to the xml files
+        // TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        // Transformer transformer = transformerFactory.newTransformer();
+
+        // DOMSource parmDocSource = new DOMSource(newParmDocument);
+        // DOMSource cfgDocSource = new DOMSource(newCfgDocument);
+        // DOMSource wizardSettingsDocSource = new DOMSource(newWizardSettingsDocument);
+
+        // StreamResult parmDocResult = new StreamResult(new File(newParmFile));
+        // StreamResult cfgDocResult = new StreamResult(new File(newCfgFile));
+        // StreamResult wizardSettingsDocResult = new StreamResult(new File(newWizardSettingsFile));
+
+        // transformer.transform(parmDocSource, parmDocResult);
+        // transformer.transform(cfgDocSource, cfgDocResult);
+        // transformer.transform(wizardSettingsDocSource, wizardSettingsDocResult);
+
+        // System.out.println("xml values written");
 
     }
 }
