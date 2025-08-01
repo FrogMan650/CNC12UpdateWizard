@@ -25,7 +25,7 @@ public class App {
     public static ArrayList<Integer> paramsToCheck = new ArrayList<>();
     public static String board;
     public static String versionRaw;
-    public static int versionCombined;
+    public static double versionCombined;
     public static void main(String[] args) throws Exception {
         paramsToCheck.add(700);
         paramsToCheck.add(710);
@@ -67,10 +67,11 @@ public class App {
         versionRaw = softwareVersionSplit[3];
         String[] versionSplitSplit = versionRaw.split("\\.");
         if (versionSplitSplit.length == 2) {
-            versionCombined = Integer.parseInt(versionSplitSplit[0]) * Integer.parseInt(versionSplitSplit[1]);
+            versionCombined = Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
         } else {
-            versionCombined = Integer.parseInt(versionSplitSplit[0]) * Integer.parseInt(versionSplitSplit[1]) + Integer.parseInt(versionSplitSplit[2]);
+            versionCombined = Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1] + "." + versionSplitSplit[2]);
         }
+        System.out.println(versionCombined);
 
         // //5. Get node list
         // NodeList oldParmNodeList = oldParmRootElement.getElementsByTagName("value");
