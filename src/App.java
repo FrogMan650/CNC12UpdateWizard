@@ -106,6 +106,14 @@ public class App {
         Files.copy(Paths.get("C:/old cncm/license.dat"), Paths.get("C:/cncm/license.dat"), StandardCopyOption.REPLACE_EXISTING);
         System.out.println("License DONE");
 
+        //Offset library file
+        Files.copy(Paths.get("C:/old cncm/cncm.ol"), Paths.get("C:/cncm/cncm.ol"), StandardCopyOption.REPLACE_EXISTING);
+        System.out.println("Offset library DONE");
+
+        //Tool library file
+        Files.copy(Paths.get("C:/old cncm/cncm.tl"), Paths.get("C:/cncm/cncm.tl"), StandardCopyOption.REPLACE_EXISTING);
+        System.out.println("Tool library DONE");
+
         //Options file
         NodeList oldOptionsNodeList = oldOptionsRootElement.getElementsByTagName("VcpOption");
         NodeList newOptionsNodeList = newOptionsRootElement.getElementsByTagName("VcpOption");
@@ -124,13 +132,12 @@ public class App {
         //Wizard settings file
         NodeList oldWizardSettingsNodeList = oldWizardSettingsRootElement.getChildNodes();
         NodeList newWizardSettingsNodeList = newWizardSettingsRootElement.getChildNodes();
-        for (int i = 1; i < oldWizardSettingsNodeList.getLength(); i = i+2) {
+        for (int i = oldWizardSettingsNodeList.getLength()-2; i > 0; i = i-2) {
             for (int j = 1; j < newWizardSettingsNodeList.getLength(); j = j+2) {
                 if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
                     Element element = (Element) oldWizardSettingsNodeList.item(i);
                     Element element2 = (Element) newWizardSettingsNodeList.item(j);
                     element2.setAttribute("value", element.getAttribute("value"));
-                    break;
                 }
             }
         }
@@ -168,6 +175,24 @@ public class App {
             }
         }
         System.out.println("cncm.prm.xml DONE");
+
+        //Special cases
+
+        //Homing file
+        Node homingFileNode = newWizardSettingsRootElement.getElementsByTagName("HomingFileType").item(0);
+        Element homingElement = (Element) homingFileNode;
+        if (homingElement.getAttribute("value").equals("Custom")) {
+            Files.copy(Paths.get("C:/old cncm/cncm.hom"), Paths.get("C:/cncm/cncm.hom"), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Homing file DONE");
+        }
+
+        //Tool change file
+        Node toolChangeFileNode = newWizardSettingsRootElement.getElementsByTagName("CustomToolChangeMacro").item(0);
+        Element toolChangeElement = (Element) toolChangeFileNode;
+        if (toolChangeElement.getAttribute("value").equals("True")) {
+            Files.copy(Paths.get("C:/old cncm/mfunc6.mac"), Paths.get("C:/cncm/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Tool change macro DONE");
+        }
 
         //Write to the xml files
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
