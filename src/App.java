@@ -28,55 +28,33 @@ public class App {
     public static double oldversionCombined;
     public static double newversionCombined;
     public static void main(String[] args) throws Exception {
-        //File and directory paths
-        String cncmDirectoryPath = "C:/cncm";
-        String cnctDirectoryPath = "C:/cnct";
-        String cncrDirectoryPath = "C:/cncr";
-        String cncpDirectoryPath = "C:/cncp";
-        String cnclDirectoryPath = "C:/cncl";
-        String oldCncmDirectoryPath = "C:/old cncm";
-        String oldCnctDirectoryPath = "C:/old cnct";
-        String oldCncrDirectoryPath = "C:/old cncr";
-        String oldCncpDirectoryPath = "C:/old cncp";
-        String oldCnclDirectoryPath = "C:/old cncl";
-
         //Check for CNC12 directories
-        File cncmDirectory = new File(cncmDirectoryPath);
-        File cnctDirectory = new File(cnctDirectoryPath);
-        File cncrDirectory = new File(cncrDirectoryPath);
-        File cncpDirectory = new File(cncpDirectoryPath);
-        File cnclDirectory = new File(cnclDirectoryPath);
-        File oldCncmDirectory = new File(oldCncmDirectoryPath);
-        File oldCnctDirectory = new File(oldCnctDirectoryPath);
-        File oldCncrDirectory = new File(oldCncrDirectoryPath);
-        File oldCncpDirectory = new File(oldCncpDirectoryPath);
-        File oldCnclDirectory = new File(oldCnclDirectoryPath);
-        if (cncmDirectory.exists() && oldCncmDirectory.exists()) {
+        if (checkDirectory("cncm")) {
             directoryName = "cncm"; 
             System.out.println("Software: Mill");
         }
-        if (cnctDirectory.exists() && oldCnctDirectory.exists()) {
+        if (checkDirectory("cnct")) {
             if (directoryName != "") {
                 throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
             }
             directoryName = "cnct"; 
             System.out.println("Software: Lathe");
         }
-        if (cncrDirectory.exists() && oldCncrDirectory.exists()) {
+        if (checkDirectory("cncr")) {
             if (directoryName != "") {
                 throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
             }
             directoryName = "cncr"; 
             System.out.println("Software: Router");
         }
-        if (cncpDirectory.exists() && oldCncpDirectory.exists()) {
+        if (checkDirectory("cncp")) {
             if (directoryName != "") {
                 throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
             }
             directoryName = "cncp"; 
             System.out.println("Software: Plasma");
         }
-        if (cnclDirectory.exists() && oldCnclDirectory.exists()) {
+        if (checkDirectory("cncl")) {
             if (directoryName != "") {
                 throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
             }
@@ -361,9 +339,15 @@ public class App {
             System.out.println("Exception thrown while getting combined version");
         }
         if (versionSplitSplit.length == 2) {
-                return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
-            } else {
-                return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1] + "." + versionSplitSplit[2]);
-            }
+            return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
+        } else {
+            return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1] + "." + versionSplitSplit[2]);
+        }
+    }
+
+    public static Boolean checkDirectory(String directory) {
+        File firstDirectory = new File("C:/" + directory);
+        File secondDirectory = new File("C:/old " + directory);
+        return firstDirectory.exists() && secondDirectory.exists();
     }
 }
