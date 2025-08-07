@@ -81,6 +81,10 @@ public class App {
         String newOptionsFile = "C:/" + directoryName + "/resources/vcp/options.xml";
         String oldHomeFile = "C:/old " + directoryName + "/" + directoryFiles + ".hom";
         String newHomeFile = "C:/" + directoryName + "/" + directoryFiles + ".hom";
+        String oldCarouselSettingsFile = "C:/old " + directoryName + "/FixedCarouselSettings.xml";
+        String newCarouselSettingsFile = "C:/" + directoryName + "/FixedCarouselSettings.xml";
+        String oldRackMountFile = "C:/old " + directoryName + "/RackMountBin.xml";
+        String newRackMountFile = "C:/" + directoryName + "/RackMountBin.xml";
         String oldToolChangeMacroFile;
         String newToolChangeMacroFile;
         if (directoryName.equals("cnct")) {
@@ -100,6 +104,10 @@ public class App {
         Document newWizardSettingsDocument = getDocument(newWizardSettingsFile);
         Document oldOptionsDocument = getDocument(oldOptionsFile);
         Document newOptionsDocument = getDocument(newOptionsFile);
+        Document oldCarouselSettingsDocument = getDocument(oldCarouselSettingsFile);
+        Document newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
+        Document oldRackMountDocument = getDocument(oldRackMountFile);
+        Document newRackMountDocument = getDocument(newRackMountFile);
 
         //Get board and software versions
         oldversionRaw = setRawVersion(oldParmFile);
@@ -129,6 +137,58 @@ public class App {
                 System.out.println("Exception thrown while copying tool library file");
                 System.out.println(e);
             }
+        }
+        
+        //Carousel settings file
+        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
+            try {
+                NodeList oldCarouselNodeList = getRootElement(oldCarouselSettingsDocument).getChildNodes();
+                NodeList newCarouselNodeList = getRootElement(newCarouselSettingsDocument).getChildNodes();
+                for (int i = 1; i < newCarouselNodeList.getLength(); i = i+2) {
+                    for (int j = 1; j < oldCarouselNodeList.getLength(); j = j+2) {
+                        if (newCarouselNodeList.item(i).getNodeName().equals(oldCarouselNodeList.item(j).getNodeName())) {
+                            newCarouselNodeList.item(i).setTextContent(oldCarouselNodeList.item(j).getTextContent());
+                        }
+                    }
+                }
+                writeToXml(newCarouselSettingsFile, newCarouselSettingsDocument);
+                System.out.println("Carousel settings DONE");
+            } catch (Exception e) {
+                System.out.println("Exception thrown while parsing carousel file");
+                System.out.println(e);
+            }
+        }
+        
+        //Rack mount settings file
+        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
+            try {
+                NodeList oldRackMountNodeList = getRootElement(oldRackMountDocument).getElementsByTagName("Bin");
+                NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
+                for (int i = 0; i < oldRackMountNodeList.getLength(); i ++) {
+                    for (int j = 1; j < oldRackMountNodeList.item(i).getChildNodes().getLength(); j = j+2) {
+                        for (int k = 1; k < newRackMountNodeList.item(i).getChildNodes().getLength(); k = k+2) {
+                            if (oldRackMountNodeList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeList.item(i).getChildNodes().item(k).getNodeName())) {
+                                newRackMountNodeList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeList.item(i).getChildNodes().item(j).getTextContent());
+                            }//this works fine, just doesnt account for settings that aren't bins, needs fixed
+                            
+                        }
+                    }
+                }
+                writeToXml(newRackMountFile, newRackMountDocument);
+                System.out.println("Rack mount settings DONE");
+            } catch (Exception e) {
+                System.out.println("Exception thrown while parsing rack mount file");
+                System.out.println(e);
+            }
+        }
+
+        //WCS file
+        try {
+            Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".wcs"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".wcs"), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("WCS DONE");
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying WCS file");
+            System.out.println(e);
         }
         
         //Tool library file
