@@ -144,8 +144,8 @@ public class App {
             try {
                 NodeList oldCarouselNodeList = getRootElement(oldCarouselSettingsDocument).getChildNodes();
                 NodeList newCarouselNodeList = getRootElement(newCarouselSettingsDocument).getChildNodes();
-                for (int i = 1; i < newCarouselNodeList.getLength(); i = i+2) {
-                    for (int j = 1; j < oldCarouselNodeList.getLength(); j = j+2) {
+                for (int i = 0; i < newCarouselNodeList.getLength(); i ++) {
+                    for (int j = 0; j < oldCarouselNodeList.getLength(); j ++) {
                         if (newCarouselNodeList.item(i).getNodeName().equals(oldCarouselNodeList.item(j).getNodeName())) {
                             newCarouselNodeList.item(i).setTextContent(oldCarouselNodeList.item(j).getTextContent());
                         }
@@ -162,15 +162,25 @@ public class App {
         //Rack mount settings file
         if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
             try {
-                NodeList oldRackMountNodeList = getRootElement(oldRackMountDocument).getElementsByTagName("Bin");
-                NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
-                for (int i = 0; i < oldRackMountNodeList.getLength(); i ++) {
-                    for (int j = 1; j < oldRackMountNodeList.item(i).getChildNodes().getLength(); j = j+2) {
-                        for (int k = 1; k < newRackMountNodeList.item(i).getChildNodes().getLength(); k = k+2) {
-                            if (oldRackMountNodeList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeList.item(i).getChildNodes().item(k).getNodeName())) {
-                                newRackMountNodeList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeList.item(i).getChildNodes().item(j).getTextContent());
-                            }//this works fine, just doesnt account for settings that aren't bins, needs fixed
-                            
+                NodeList oldRackMountNodeBinList = getRootElement(oldRackMountDocument).getElementsByTagName("Bin");
+                NodeList newRackMountNodeBinList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
+                NodeList oldRackMountNodeList = getRootElement(oldRackMountDocument).getChildNodes();
+                NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
+                for (int i = 0; i < oldRackMountNodeBinList.getLength(); i ++) {
+                    for (int j = 0; j < oldRackMountNodeBinList.item(i).getChildNodes().getLength(); j ++) {
+                        for (int k = 0; k < newRackMountNodeBinList.item(i).getChildNodes().getLength(); k ++) {
+                            if (oldRackMountNodeBinList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeBinList.item(i).getChildNodes().item(k).getNodeName())) {
+                                newRackMountNodeBinList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeBinList.item(i).getChildNodes().item(j).getTextContent());
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
+                    for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
+                        if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName()) && oldRackMountNodeList.item(i).getNodeName() != "Bin") {
+                            newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
+                            break;
                         }
                     }
                 }
@@ -205,7 +215,7 @@ public class App {
             System.out.println(e);
         }
         
-        //Options file
+        //VCP Options file
         try {
             NodeList oldOptionsNodeList = getRootElement(oldOptionsDocument).getElementsByTagName("VcpOption");
             NodeList newOptionsNodeList = getRootElement(newOptionsDocument).getElementsByTagName("VcpOption");
@@ -230,8 +240,8 @@ public class App {
         try {
             NodeList oldWizardSettingsNodeList = getRootElement(oldWizardSettingsDocument).getChildNodes();
             NodeList newWizardSettingsNodeList = getRootElement(newWizardSettingsDocument).getChildNodes();
-            for (int i = oldWizardSettingsNodeList.getLength()-2; i > 0; i = i-2) {
-                for (int j = 1; j < newWizardSettingsNodeList.getLength(); j = j+2) {
+            for (int i = oldWizardSettingsNodeList.getLength()-1; i > 0; i --) {
+                for (int j = 0; j < newWizardSettingsNodeList.getLength(); j ++) {
                     if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
                         Element element = (Element) oldWizardSettingsNodeList.item(i);
                         Element element2 = (Element) newWizardSettingsNodeList.item(j);
@@ -250,13 +260,13 @@ public class App {
         try {
             NodeList oldCfgNodeList = getRootElement(oldCfgDocument).getChildNodes();
             NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
-        for (int i = 1; i < oldCfgNodeList.getLength(); i = i+2) {
+        for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
             Element element = (Element) oldCfgNodeList.item(i);
             Element element2 = (Element) newCfgNodeList.item(i);
             NamedNodeMap attributes = element.getAttributes();
             NamedNodeMap attributes2 = element2.getAttributes();
-            for (int j = 0; j < attributes.getLength(); j++) {
-                for (int k = 0; k < attributes2.getLength(); k++) {
+            for (int j = 0; j < attributes.getLength()-1; j++) {
+                for (int k = 0; k < attributes2.getLength()-1; k++) {
                     if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
                     element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
                     break;
@@ -331,6 +341,15 @@ public class App {
         System.out.println("Update finished");
     }
 
+    public static Element trimEmptyElements(Element node) {
+        for (int i = node.getChildNodes().getLength()-1; i >= 0; i--) {
+            if (node.getChildNodes().item(i).getTextContent().trim().isEmpty() && !node.getChildNodes().item(i).hasAttributes()) {
+                node.removeChild(node.getChildNodes().item(i));
+            }
+        }
+        return node;
+    }
+
     public static int roundVersion(double version) {
         double scaledVersion = version / 10;
         double roundScaledVersion = Math.floor(scaledVersion)*10;
@@ -361,7 +380,7 @@ public class App {
             System.out.println("Exception thrown while getting root element from document");
             System.out.println(e);
         }
-            return rootElement;
+            return trimEmptyElements(rootElement);
     }
 
     public static void writeToXml(String filePath, Document document) {
