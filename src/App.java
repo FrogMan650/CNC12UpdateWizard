@@ -96,17 +96,11 @@ public class App {
         }
 
         //Open documents
-        Document oldParmDocument = getDocument(oldParmFile);
         Document newParmDocument = getDocument(newParmFile);
-        Document oldCfgDocument = getDocument(oldCfgFile);
         Document newCfgDocument = getDocument(newCfgFile);
-        Document oldWizardSettingsDocument = getDocument(oldWizardSettingsFile);
         Document newWizardSettingsDocument = getDocument(newWizardSettingsFile);
-        Document oldOptionsDocument = getDocument(oldOptionsFile);
         Document newOptionsDocument = getDocument(newOptionsFile);
-        Document oldCarouselSettingsDocument = getDocument(oldCarouselSettingsFile);
         Document newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
-        Document oldRackMountDocument = getDocument(oldRackMountFile);
         Document newRackMountDocument = getDocument(newRackMountFile);
 
         //Get board and software versions
@@ -142,7 +136,7 @@ public class App {
         //Carousel settings file
         if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
             try {
-                NodeList oldCarouselNodeList = getRootElement(oldCarouselSettingsDocument).getChildNodes();
+                NodeList oldCarouselNodeList = getRootElement(getDocument(oldCarouselSettingsFile)).getChildNodes();
                 NodeList newCarouselNodeList = getRootElement(newCarouselSettingsDocument).getChildNodes();
                 for (int i = 0; i < newCarouselNodeList.getLength(); i ++) {
                     for (int j = 0; j < oldCarouselNodeList.getLength(); j ++) {
@@ -162,9 +156,9 @@ public class App {
         //Rack mount settings file
         if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
             try {
-                NodeList oldRackMountNodeBinList = getRootElement(oldRackMountDocument).getElementsByTagName("Bin");
+                NodeList oldRackMountNodeBinList = getRootElement(getDocument(oldRackMountFile)).getElementsByTagName("Bin");
                 NodeList newRackMountNodeBinList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
-                NodeList oldRackMountNodeList = getRootElement(oldRackMountDocument).getChildNodes();
+                NodeList oldRackMountNodeList = getRootElement(getDocument(oldRackMountFile)).getChildNodes();
                 NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
                 for (int i = 0; i < oldRackMountNodeBinList.getLength(); i ++) {
                     for (int j = 0; j < oldRackMountNodeBinList.item(i).getChildNodes().getLength(); j ++) {
@@ -217,14 +211,14 @@ public class App {
         
         //VCP Options file
         try {
-            NodeList oldOptionsNodeList = getRootElement(oldOptionsDocument).getElementsByTagName("VcpOption");
+            NodeList oldOptionsNodeList = getRootElement(getDocument(oldOptionsFile)).getElementsByTagName("VcpOption");
             NodeList newOptionsNodeList = getRootElement(newOptionsDocument).getElementsByTagName("VcpOption");
             for(int i = 0; i < oldOptionsNodeList.getLength(); i ++) {
                 for(int j = 0; j < newOptionsNodeList.getLength(); j ++) {
-                    String oldOptionNodeText = oldOptionsNodeList.item(i).getChildNodes().item(1).getTextContent();
-                    String newOptionNodeText = newOptionsNodeList.item(j).getChildNodes().item(1).getTextContent();
+                    String oldOptionNodeText = oldOptionsNodeList.item(i).getChildNodes().item(0).getTextContent();
+                    String newOptionNodeText = newOptionsNodeList.item(j).getChildNodes().item(0).getTextContent();
                     if (oldOptionNodeText.equals(newOptionNodeText)) {
-                        newOptionsNodeList.item(j).getChildNodes().item(3).setTextContent(oldOptionsNodeList.item(i).getChildNodes().item(3).getTextContent());
+                        newOptionsNodeList.item(j).getChildNodes().item(1).setTextContent(oldOptionsNodeList.item(i).getChildNodes().item(1).getTextContent());
                         break;
                     }
                 }
@@ -238,9 +232,9 @@ public class App {
 
         //Wizard settings file
         try {
-            NodeList oldWizardSettingsNodeList = getRootElement(oldWizardSettingsDocument).getChildNodes();
+            NodeList oldWizardSettingsNodeList = getRootElement(getDocument(oldWizardSettingsFile)).getChildNodes();
             NodeList newWizardSettingsNodeList = getRootElement(newWizardSettingsDocument).getChildNodes();
-            for (int i = oldWizardSettingsNodeList.getLength()-1; i > 0; i --) {
+            for (int i = oldWizardSettingsNodeList.getLength()-1; i >= 0; i --) {
                 for (int j = 0; j < newWizardSettingsNodeList.getLength(); j ++) {
                     if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
                         Element element = (Element) oldWizardSettingsNodeList.item(i);
@@ -258,24 +252,26 @@ public class App {
 
         //Config settings file
         try {
-            NodeList oldCfgNodeList = getRootElement(oldCfgDocument).getChildNodes();
+            NodeList oldCfgNodeList = getRootElement(getDocument(oldCfgFile)).getChildNodes();
             NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
-        for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
-            Element element = (Element) oldCfgNodeList.item(i);
-            Element element2 = (Element) newCfgNodeList.item(i);
-            NamedNodeMap attributes = element.getAttributes();
-            NamedNodeMap attributes2 = element2.getAttributes();
-            for (int j = 0; j < attributes.getLength()-1; j++) {
-                for (int k = 0; k < attributes2.getLength()-1; k++) {
-                    if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
-                    element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
-                    break;
+            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+            }
+            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+                Element element = (Element) oldCfgNodeList.item(i);
+                Element element2 = (Element) newCfgNodeList.item(i);
+                NamedNodeMap attributes = element.getAttributes();
+                NamedNodeMap attributes2 = element2.getAttributes();
+                for (int j = 0; j < attributes.getLength(); j++) {
+                    for (int k = 0; k < attributes2.getLength(); k++) {
+                        if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
+                        element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
+                        break;
+                        }
                     }
                 }
             }
-        }
-        writeToXml(newCfgFile, newCfgDocument);
-        System.out.println("Config DONE");
+            writeToXml(newCfgFile, newCfgDocument);
+            System.out.println("Config DONE");
         } catch (Exception e) {
             System.out.println("Exception thrown during config file parsing");
             System.out.println(e);
@@ -293,7 +289,7 @@ public class App {
 
         //Parm values file
         try {
-            NodeList oldParmNodeList = getRootElement(oldParmDocument).getElementsByTagName("value");
+            NodeList oldParmNodeList = getRootElement(getDocument(oldParmFile)).getElementsByTagName("value");
             NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
             for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
                 Node oldParmNode = oldParmNodeList.item(i);
@@ -345,6 +341,14 @@ public class App {
         for (int i = node.getChildNodes().getLength()-1; i >= 0; i--) {
             if (node.getChildNodes().item(i).getTextContent().trim().isEmpty() && !node.getChildNodes().item(i).hasAttributes()) {
                 node.removeChild(node.getChildNodes().item(i));
+                continue;
+            }
+            if (node.getChildNodes().item(i).hasChildNodes()) {
+                for (int j = node.getChildNodes().item(i).getChildNodes().getLength()-1; j >= 0; j--) {
+                    if (node.getChildNodes().item(i).getChildNodes().item(j).getTextContent().trim().isEmpty() && !node.getChildNodes().item(i).getChildNodes().item(j).hasAttributes()) {
+                        node.getChildNodes().item(i).removeChild(node.getChildNodes().item(i).getChildNodes().item(j));
+                    }
+                }
             }
         }
         return node;
