@@ -160,24 +160,43 @@ public class App {
                 NodeList newRackMountNodeBinList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
                 NodeList oldRackMountNodeList = getRootElement(getDocument(oldRackMountFile)).getChildNodes();
                 NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
-                for (int i = 0; i < oldRackMountNodeBinList.getLength(); i ++) {
-                    for (int j = 0; j < oldRackMountNodeBinList.item(i).getChildNodes().getLength(); j ++) {
-                        for (int k = 0; k < newRackMountNodeBinList.item(i).getChildNodes().getLength(); k ++) {
-                            if (oldRackMountNodeBinList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeBinList.item(i).getChildNodes().item(k).getNodeName())) {
-                                newRackMountNodeBinList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeBinList.item(i).getChildNodes().item(j).getTextContent());
+                for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
+                    for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
+                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() == 1 && newRackMountNodeList.item(j).getChildNodes().getLength() == 1) {
+                            if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName())) {
+                                newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
+                            }
+                        }
+                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() > 1 && newRackMountNodeList.item(j).getChildNodes().getLength() > 1 && 
+                        oldRackMountNodeList.item(i).getFirstChild().getTextContent().equals(newRackMountNodeList.item(j).getFirstChild().getTextContent())) {
+                            for (int k = 0; k < oldRackMountNodeList.item(i).getChildNodes().getLength(); k++) {
+                                for (int l = 0; l < newRackMountNodeList.item(j).getChildNodes().getLength(); l++) {
+                                    if (oldRackMountNodeList.item(i).getChildNodes().item(k).getNodeName().equals(newRackMountNodeList.item(j).getChildNodes().item(l).getNodeName())) {
+                                        newRackMountNodeList.item(j).getChildNodes().item(l).setTextContent(oldRackMountNodeList.item(i).getChildNodes().item(k).getTextContent());
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                // for (int i = 0; i < oldRackMountNodeBinList.getLength(); i ++) {
+                //     for (int j = 0; j < oldRackMountNodeBinList.item(i).getChildNodes().getLength(); j ++) {
+                //         for (int k = 0; k < newRackMountNodeBinList.item(i).getChildNodes().getLength(); k ++) {
+                //             if (oldRackMountNodeBinList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeBinList.item(i).getChildNodes().item(k).getNodeName())) {
+                //                 newRackMountNodeBinList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeBinList.item(i).getChildNodes().item(j).getTextContent());
+                //             }
+                //         }
+                //     }
+                // }
 
-                for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
-                    for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
-                        if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName()) && oldRackMountNodeList.item(i).getNodeName() != "Bin") {
-                            newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
-                            break;
-                        }
-                    }
-                }
+                // for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
+                //     for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
+                //         if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName()) && oldRackMountNodeList.item(i).getNodeName() != "Bin") {
+                //             newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
+                //             break;
+                //         }
+                //     }
+                // }
                 writeToXml(newRackMountFile, newRackMountDocument);
                 System.out.println("Rack mount settings DONE");
             } catch (Exception e) {
