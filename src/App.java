@@ -27,6 +27,7 @@ public class App {
     public static String newversionRaw;
     public static double oldversionCombined;
     public static double newversionCombined;
+    public static String boardKeyA;
     public static void main(String[] args) throws Exception {
         //Check for CNC12 directories
         if (checkDirectory("cncm")) {
@@ -103,15 +104,16 @@ public class App {
         Document newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
         Document newRackMountDocument = getDocument(newRackMountFile);
 
-        //Get board and software versions
+        //Get board, software versions, and KeyA
         oldversionRaw = setRawVersion(oldParmFile);
         newversionRaw = setRawVersion(newParmFile);
         oldversionCombined = getVersionCombined(oldversionRaw);
         newversionCombined = getVersionCombined(newversionRaw);
+        boardKeyA = getKeyA(newCfgFile);
 
         System.out.println("Board: " + board);
-        System.out.println("Old version: " + oldversionRaw);
-        System.out.println("New version: " + newversionRaw);
+        System.out.println("KeyA: " + boardKeyA);
+        System.out.println("Version: " + oldversionRaw + " -> " + newversionRaw);
         
         //License file
         try {
@@ -156,8 +158,6 @@ public class App {
         //Rack mount settings file
         if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
             try {
-                NodeList oldRackMountNodeBinList = getRootElement(getDocument(oldRackMountFile)).getElementsByTagName("Bin");
-                NodeList newRackMountNodeBinList = getRootElement(newRackMountDocument).getElementsByTagName("Bin");
                 NodeList oldRackMountNodeList = getRootElement(getDocument(oldRackMountFile)).getChildNodes();
                 NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
                 for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
@@ -179,24 +179,6 @@ public class App {
                         }
                     }
                 }
-                // for (int i = 0; i < oldRackMountNodeBinList.getLength(); i ++) {
-                //     for (int j = 0; j < oldRackMountNodeBinList.item(i).getChildNodes().getLength(); j ++) {
-                //         for (int k = 0; k < newRackMountNodeBinList.item(i).getChildNodes().getLength(); k ++) {
-                //             if (oldRackMountNodeBinList.item(i).getChildNodes().item(j).getNodeName().equals(newRackMountNodeBinList.item(i).getChildNodes().item(k).getNodeName())) {
-                //                 newRackMountNodeBinList.item(i).getChildNodes().item(k).setTextContent(oldRackMountNodeBinList.item(i).getChildNodes().item(j).getTextContent());
-                //             }
-                //         }
-                //     }
-                // }
-
-                // for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
-                //     for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
-                //         if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName()) && oldRackMountNodeList.item(i).getNodeName() != "Bin") {
-                //             newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
-                //             break;
-                //         }
-                //     }
-                // }
                 writeToXml(newRackMountFile, newRackMountDocument);
                 System.out.println("Rack mount settings DONE");
             } catch (Exception e) {
@@ -353,7 +335,19 @@ public class App {
         }
 
         //FINISHED
-        System.out.println("Update finished");
+        System.out.println("Update Complete");
+    }
+
+    public static String getKeyA(String filePath) {
+        String keyA;
+        String[] keyASplit = null;
+        try {
+            keyA = getRootElement(getDocument(filePath)).getAttribute("v300_Header").trim();
+            keyASplit = keyA.split(" ");
+        } catch (Exception e) {
+            System.out.println("Exception thrown while getting KeyA");
+        }
+        return keyASplit[keyASplit.length-1];
     }
 
     public static Element trimEmptyElements(Element node) {
