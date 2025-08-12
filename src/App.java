@@ -3,6 +3,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +31,7 @@ public class App {
     public static double oldversionCombined;
     public static double newversionCombined;
     public static String boardKeyA;
+    public static String sourceFile;
     public static void main(String[] args) throws Exception {
         //Check for CNC12 directories
         if (checkDirectory("cncm")) {
@@ -86,6 +90,7 @@ public class App {
         String newCarouselSettingsFile = "C:/" + directoryName + "/FixedCarouselSettings.xml";
         String oldRackMountFile = "C:/old " + directoryName + "/RackMountBin.xml";
         String newRackMountFile = "C:/" + directoryName + "/RackMountBin.xml";
+        String oldMPUPLC = "C:/old " + directoryName + "/mpu.plc";
         String oldToolChangeMacroFile;
         String newToolChangeMacroFile;
         if (directoryName.equals("cnct")) {
@@ -334,6 +339,79 @@ public class App {
             System.out.println(e);
         }
 
+        //Get source file
+        try {
+            File file = new File(oldMPUPLC);
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.contains("Source file")) {
+                    sourceFile = line.split(":")[1].trim();
+                    break;
+                }
+            }
+            scanner.close();
+        } catch (Exception e) {
+            System.out.println("Exception thrown while parsing mpu.plc");
+            System.out.println(e);
+        }
+
+        //Inputs, Outputs, and USB-BOB I/O
+        try {
+            Map<String, String> inputsMap = new LinkedHashMap<>();
+            Map<String, String> outputsMap = new LinkedHashMap<>();
+            Map<String, String> usbInputsMap = new LinkedHashMap<>();
+            Map<String, String> usbOutputsMap = new LinkedHashMap<>();
+            File file = new File("C:/old " + directoryName + "/" + sourceFile);
+            Scanner scanner = new Scanner(file);
+            String region = "";
+            int counter = 0;
+            while (counter < 4) {
+                String line = scanner.nextLine();
+                if (line.contains("#endregion")) {
+                    region = "";
+                    counter ++;
+                } else if (line.equals("; #wizardregion Inputs") || region.equals("inputs")) {
+                    region = "inputs";
+                    String[] lineSplit = line.trim().split(" ");
+                    inputsMap.put(lineSplit[0], lineSplit[1]);
+                } else if (line.equals("; #wizardregion Outputs") || region.equals("outputs")) {
+                    region = "outputs";
+                    String[] lineSplit = line.trim().split(" ");
+                    outputsMap.put(lineSplit[0], lineSplit[1]);
+                } else if (line.equals("; #wizardregion UsbInputs") || region.equals("usbinputs")) {
+                    region = "usbinputs";
+                    String[] lineSplit = line.trim().split(" ");
+                    usbInputsMap.put(lineSplit[0], lineSplit[1]);
+                } else if (line.equals("; #wizardregion UsbOutputs") || region.equals("usboutputs")) {
+                    region = "usboutputs";
+                    String[] lineSplit = line.trim().split(" ");
+                    usbOutputsMap.put(lineSplit[0], lineSplit[1]);
+                }
+            }
+            System.out.println("INPUTS");
+            for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
+            System.out.println("OUTPUTS");
+            for (Map.Entry<String, String> entry : outputsMap.entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
+            System.out.println("USB INPUTS");
+            for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
+            System.out.println("USB OUTPUTS");
+            for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
+            scanner.close();
+        } catch (Exception e) {
+            System.out.println("Exception thrown while parsing source file");
+            System.out.println(e);
+        }
+
+
         //FINISHED
         System.out.println("Update Complete");
     }
@@ -346,6 +424,7 @@ public class App {
             keyASplit = keyA.split(" ");
         } catch (Exception e) {
             System.out.println("Exception thrown while getting KeyA");
+            System.out.println(e);
         }
         return keyASplit[keyASplit.length-1];
     }
@@ -409,6 +488,7 @@ public class App {
             transformer.transform(docSource, docResult);
         } catch (Exception e) {
             System.out.println("Exception thrown while writing to file: " + filePath);
+            System.out.println(e);
         }
     }
 
@@ -422,6 +502,7 @@ public class App {
             softwareVersionSplit = softwareVersion.split(" ");
         } catch (Exception e) {
             System.out.println("Exception thrown while setting raw version");
+            System.out.println(e);
         }
         board = softwareVersionSplit[0];
         return softwareVersionSplit[3];
@@ -433,6 +514,7 @@ public class App {
             versionSplitSplit = rawVersion.split("\\.");
         } catch (Exception e) {
             System.out.println("Exception thrown while getting combined version");
+            System.out.println(e);
         }
         if (versionSplitSplit.length == 2) {
             return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
