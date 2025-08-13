@@ -10,6 +10,8 @@
     <Parameter>36</Parameter>
     <Parameter>37</Parameter>
     <Parameter>39</Parameter>
+    <Parameter>40</Parameter>
+    <Parameter>41</Parameter>
     <Parameter>42</Parameter>
     <Parameter>43</Parameter>
     <Parameter>46</Parameter>
@@ -55,6 +57,7 @@
     <Parameter>348</Parameter>
     <Parameter>349</Parameter>
     <Parameter>350</Parameter>
+    <Parameter>365</Parameter>
     <Parameter>400</Parameter>
     <Parameter>401</Parameter>
     <Parameter>403</Parameter>
@@ -80,6 +83,10 @@
     <Parameter>433</Parameter>
     <Parameter>450</Parameter>
     <Parameter>500</Parameter>
+    <Parameter>501</Parameter>
+    <Parameter>502</Parameter>
+    <Parameter>503</Parameter>
+    <Parameter>504</Parameter>
     <Parameter>505</Parameter>
     <Parameter>506</Parameter>
     <Parameter>507</Parameter>

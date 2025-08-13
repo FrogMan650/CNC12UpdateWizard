@@ -116,6 +116,9 @@ public class App {
         newversionRaw = setRawVersion(newParmFile);
         oldversionCombined = getVersionCombined(oldversionRaw);
         newversionCombined = getVersionCombined(newversionRaw);
+        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only
+            newversionCombined = 540;
+        }
         boardKeyA = getKeyA(newCfgFile);
 
         System.out.println("Board: " + board);
@@ -306,6 +309,7 @@ public class App {
                 String text = element.getTextContent();
                 if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
                     newParmNode.setTextContent(text);
+                    //newParmNode.setTextContent("69");//for testing
                 }
             }
             writeToXml(newParmFile, newParmDocument);
@@ -365,7 +369,7 @@ public class App {
             String region = "";
             Boolean record = false;
             int counter = 0;
-            while (counter < 3) {
+            while (counter < 3 && scanner.hasNext()) {
                 String line = scanner.nextLine();
                 if (line.contains("#endregion") && record) {
                     counter ++;
