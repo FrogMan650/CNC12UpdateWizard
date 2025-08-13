@@ -23,6 +23,9 @@ import org.w3c.dom.NodeList;
 public class App {
     public static ArrayList<Integer> oldParamsToCheck = new ArrayList<>();
     public static ArrayList<Integer> newParamsToCheck = new ArrayList<>();
+    public static Map<String, String> inputsMap = new LinkedHashMap<>();
+    public static Map<String, String> outputsMap = new LinkedHashMap<>();
+    public static Map<String, String> usbInputsMap = new LinkedHashMap<>();
     public static String board;
     public static String directoryName = "";
     public static String directoryFiles;
@@ -90,7 +93,6 @@ public class App {
         String newCarouselSettingsFile = "C:/" + directoryName + "/FixedCarouselSettings.xml";
         String oldRackMountFile = "C:/old " + directoryName + "/RackMountBin.xml";
         String newRackMountFile = "C:/" + directoryName + "/RackMountBin.xml";
-        String oldMPUPLC = "C:/old " + directoryName + "/mpu.plc";
         String oldToolChangeMacroFile;
         String newToolChangeMacroFile;
         if (directoryName.equals("cnct")) {
@@ -341,7 +343,7 @@ public class App {
 
         //Get source file
         try {
-            File file = new File(oldMPUPLC);
+            File file = new File("C:/old " + directoryName + "/mpu.plc");
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -356,53 +358,47 @@ public class App {
             System.out.println(e);
         }
 
-        //Inputs, Outputs, and USB-BOB I/O
+        //Inputs, Outputs, and USB-BOB Inputs
         try {
-            Map<String, String> inputsMap = new LinkedHashMap<>();
-            Map<String, String> outputsMap = new LinkedHashMap<>();
-            Map<String, String> usbInputsMap = new LinkedHashMap<>();
-            Map<String, String> usbOutputsMap = new LinkedHashMap<>();
             File file = new File("C:/old " + directoryName + "/" + sourceFile);
             Scanner scanner = new Scanner(file);
             String region = "";
+            Boolean record = false;
             int counter = 0;
-            while (counter < 4) {
+            while (counter < 3) {
                 String line = scanner.nextLine();
-                if (line.contains("#endregion")) {
-                    region = "";
+                if (line.contains("#endregion") && record) {
                     counter ++;
-                } else if (line.equals("; #wizardregion Inputs") || region.equals("inputs")) {
+                    record = false;
+                }else if (line.contains("#wizardregion Inputs")) {
+                    record = true;
                     region = "inputs";
-                    String[] lineSplit = line.trim().split(" ");
-                    inputsMap.put(lineSplit[0], lineSplit[1]);
-                } else if (line.equals("; #wizardregion Outputs") || region.equals("outputs")) {
+                } else if (line.contains("#wizardregion Outputs")) {
+                    record = true;
                     region = "outputs";
-                    String[] lineSplit = line.trim().split(" ");
-                    outputsMap.put(lineSplit[0], lineSplit[1]);
-                } else if (line.equals("; #wizardregion UsbInputs") || region.equals("usbinputs")) {
+                } else if (line.contains("#wizardregion UsbInput")) {
+                    record = true;
                     region = "usbinputs";
-                    String[] lineSplit = line.trim().split(" ");
-                    usbInputsMap.put(lineSplit[0], lineSplit[1]);
-                } else if (line.equals("; #wizardregion UsbOutputs") || region.equals("usboutputs")) {
-                    region = "usboutputs";
-                    String[] lineSplit = line.trim().split(" ");
-                    usbOutputsMap.put(lineSplit[0], lineSplit[1]);
+                } else if (record && region.equals("inputs")) {
+                    inputsMap.put(trimReplaceSplit(line)[2], trimReplaceSplit(line)[0]);
+                } else if (record && region.equals("outputs")) {
+                    outputsMap.put(trimReplaceSplit(line)[2], trimReplaceSplit(line)[0]);
+                } else if (record && region.equals("usbinputs")) {
+                    String lineSplitSV = trimReplaceSplit(line)[0].split("_")[1];
+                    String lineSPlitINP = trimReplaceSplit(line)[2].split("_")[trimReplaceSplit(line)[2].split("_").length-2] + trimReplaceSplit(line)[2].split("_")[trimReplaceSplit(line)[2].split("_").length-1];
+                    usbInputsMap.put(lineSPlitINP, lineSplitSV);
                 }
             }
-            System.out.println("INPUTS");
+            System.out.println("--INPUTS--");
             for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
-            System.out.println("OUTPUTS");
+            System.out.println("--OUTPUTS--");
             for (Map.Entry<String, String> entry : outputsMap.entrySet()) {
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
-            System.out.println("USB INPUTS");
-            for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
-            System.out.println("USB OUTPUTS");
-            for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
+            System.out.println("--USB INPUTS--");
+            for (Map.Entry<String, String> entry : usbInputsMap.entrySet()) {
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
             scanner.close();
@@ -413,7 +409,7 @@ public class App {
 
 
         //FINISHED
-        System.out.println("Update Complete");
+        System.out.println("*Update Complete*");
     }
 
     public static String getKeyA(String filePath) {
@@ -444,6 +440,11 @@ public class App {
             }
         }
         return node;
+    }
+
+    public static String[] trimReplaceSplit(String line) {
+        String[] lineSplit = line.trim().replaceAll("\\s+", " ").split(" ");
+        return lineSplit;
     }
 
     public static int roundVersion(double version) {
