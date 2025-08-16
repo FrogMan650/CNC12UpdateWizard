@@ -205,6 +205,15 @@ public class App {
             System.out.println("Exception thrown while copying WCS file");
             System.out.println(e);
         }
+
+        //Stats file
+        try {
+            Files.copy(Paths.get("C:/old "+ directoryName +"/mt.stats"), Paths.get("C:/"+ directoryName +"/mt.stats"), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Stats DONE");
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying Stats file");
+            System.out.println(e);
+        }
         
         //Tool library file
         try {
