@@ -120,6 +120,7 @@ public class App {
             newversionCombined = 540;
         }
         boardKeyA = getKeyA(newCfgFile);
+        board = getBoardType();
 
         System.out.println("Board: " + board);
         System.out.println("KeyA: " + boardKeyA);
@@ -518,8 +519,11 @@ public class App {
             System.out.println("Exception thrown while setting raw version");
             System.out.println(e);
         }
-        board = softwareVersionSplit[0];
-        return softwareVersionSplit[3];
+        if (softwareVersionSplit.length == 5) {
+            return softwareVersionSplit[2];
+        } else {
+            return softwareVersionSplit[3];
+        }
     }
 
     public static double getVersionCombined(String rawVersion) {
@@ -534,6 +538,31 @@ public class App {
             return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
         } else {
             return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1] + "." + versionSplitSplit[2]);
+        }
+    }
+
+    public static String getBoardType() {
+        NodeList boardVersionNodeList;
+        String boardVersion;
+        String oldBoard = null;
+        String newBoard = null;
+        String oldFilePath = "C:/old " + directoryName + "/mpu_info.xml";
+        String newFilePath ="C:/" + directoryName + "/mpu_info.xml";
+        try {
+            boardVersionNodeList = getRootElement(getDocument(oldFilePath)).getElementsByTagName("PLCDeviceID");
+            boardVersion = boardVersionNodeList.item(0).getTextContent();
+            oldBoard = boardVersion.split("_")[2];
+            boardVersionNodeList = getRootElement(getDocument(newFilePath)).getElementsByTagName("PLCDeviceID");
+            boardVersion = boardVersionNodeList.item(0).getTextContent();
+            newBoard = boardVersion.split("_")[2];
+        } catch (Exception e) {
+            System.out.println("Exception thrown while setting board type");
+            System.out.println(e);
+        }
+        if (oldBoard.equals(newBoard)) {
+            return newBoard;
+        } else {
+            throw new IllegalArgumentException("Board mismatch: " + oldBoard + " and " + newBoard);
         }
     }
 
