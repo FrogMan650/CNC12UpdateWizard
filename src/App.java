@@ -93,6 +93,8 @@ public class App {
         String newCarouselSettingsFile = "C:/" + directoryName + "/FixedCarouselSettings.xml";
         String oldRackMountFile = "C:/old " + directoryName + "/RackMountBin.xml";
         String newRackMountFile = "C:/" + directoryName + "/RackMountBin.xml";
+        String oldPlasmaConfigFile = "C:/old " + directoryName + "/PlasmaConfigurations.xml";
+        String newPlasmaConfigFile = "C:/" + directoryName + "/PlasmaConfigurations.xml";
         String oldToolChangeMacroFile;
         String newToolChangeMacroFile;
         if (directoryName.equals("cnct")) {
@@ -108,8 +110,16 @@ public class App {
         Document newCfgDocument = getDocument(newCfgFile);
         Document newWizardSettingsDocument = getDocument(newWizardSettingsFile);
         Document newOptionsDocument = getDocument(newOptionsFile);
-        Document newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
-        Document newRackMountDocument = getDocument(newRackMountFile);
+        Document newCarouselSettingsDocument = null;
+        Document newRackMountDocument = null;
+        Document newPlasmaConfigDocument = null;
+        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
+            newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
+            newRackMountDocument = getDocument(newRackMountFile);
+        }
+        if (directoryName.equals("cncp")) {
+            newPlasmaConfigDocument = getDocument(newPlasmaConfigFile);
+        }
 
         //Get board, software versions, and KeyA
         oldversionRaw = setRawVersion(oldParmFile);
@@ -162,6 +172,37 @@ public class App {
                 System.out.println("Carousel settings DONE");
             } catch (Exception e) {
                 System.out.println("Exception thrown while parsing carousel file");
+                System.out.println(e);
+            }
+        }
+        
+        //Plasma config file
+        if (directoryName.equals("cncp")) {
+            try {
+                File file = new File("C:/old " + directoryName + "/PlasmaConfigurations.txt");
+                NodeList newPlasmaConfigNodeList = getRootElement(newPlasmaConfigDocument).getChildNodes();
+                if (file.exists()) {
+                    Scanner scanner = new Scanner(file);
+                    int counter = 0;
+                    while (scanner.hasNextLine()) {
+                        newPlasmaConfigNodeList.item(counter).setTextContent(scanner.nextLine());
+                        counter ++;
+                    }
+                    scanner.close();
+                } else {
+                    NodeList oldPlasmaConfigNodeList = getRootElement(getDocument(oldPlasmaConfigFile)).getChildNodes();
+                    for (int i = 0; i < newPlasmaConfigNodeList.getLength(); i ++) {
+                        for (int j = 0; j < oldPlasmaConfigNodeList.getLength(); j ++) {
+                            if (newPlasmaConfigNodeList.item(i).getNodeName().equals(oldPlasmaConfigNodeList.item(j).getNodeName())) {
+                                newPlasmaConfigNodeList.item(i).setTextContent(oldPlasmaConfigNodeList.item(j).getTextContent());
+                            }
+                        }
+                    }
+                }
+                writeToXml(newPlasmaConfigFile, newPlasmaConfigDocument);
+                System.out.println("Plasma config DONE");
+            } catch (Exception e) {
+                System.out.println("Exception thrown while parsing plasma config file");
                 System.out.println(e);
             }
         }
@@ -355,26 +396,9 @@ public class App {
             System.out.println(e);
         }
 
-        //Get source file
-        try {
-            File file = new File("C:/old " + directoryName + "/mpu.plc");
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (line.contains("Source file")) {
-                    sourceFile = line.split(":")[1].trim();
-                    break;
-                }
-            }
-            scanner.close();
-        } catch (Exception e) {
-            System.out.println("Exception thrown while parsing mpu.plc");
-            System.out.println(e);
-        }
-
         //Inputs, Outputs, and USB-BOB Inputs
         try {
-            File file = new File("C:/old " + directoryName + "/" + sourceFile);
+            File file = new File("C:/old " + directoryName + "/mpu.plc");
             Scanner scanner = new Scanner(file);
             String region = "";
             Boolean record = false;
@@ -394,12 +418,13 @@ public class App {
                     record = true;
                     region = "usbinputs";
                 } else if (record && region.equals("inputs")) {
-                    inputsMap.put(trimReplaceSplit(line)[2], trimReplaceSplit(line)[0]);
+                    inputsMap.put(trimReplaceSplit(line)[3], trimReplaceSplit(line)[1]);
                 } else if (record && region.equals("outputs")) {
-                    outputsMap.put(trimReplaceSplit(line)[2], trimReplaceSplit(line)[0]);
+                    outputsMap.put(trimReplaceSplit(line)[3], trimReplaceSplit(line)[1]);
                 } else if (record && region.equals("usbinputs")) {
-                    String lineSplitSV = trimReplaceSplit(line)[0].split("_")[1];
-                    String lineSPlitINP = trimReplaceSplit(line)[2].split("_")[trimReplaceSplit(line)[2].split("_").length-2] + trimReplaceSplit(line)[2].split("_")[trimReplaceSplit(line)[2].split("_").length-1];
+                    String lineSplitSV = trimReplaceSplit(line)[1].split("_")[1];
+                    String lineSPlitINP = trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-2] + 
+                    trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-1];
                     usbInputsMap.put(lineSPlitINP, lineSplitSV);
                 }
             }
