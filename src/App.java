@@ -116,7 +116,7 @@ public class App {
         newversionRaw = setRawVersion(newParmFile);
         oldversionCombined = getVersionCombined(oldversionRaw);
         newversionCombined = getVersionCombined(newversionRaw);
-        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only
+        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
             newversionCombined = 540;
         }
         boardKeyA = getKeyA(newCfgFile);
@@ -299,8 +299,8 @@ public class App {
         }
         
         //Define params to check by version
-        NodeList oldVersionNodeList = getRootElement(getDocument("src/"+ roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
-        NodeList newVersionNodeList = getRootElement(getDocument("src/"+ roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
+        NodeList oldVersionNodeList = getRootElement(getDocument("src/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
+        NodeList newVersionNodeList = getRootElement(getDocument("src/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
         for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
             oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
         }
