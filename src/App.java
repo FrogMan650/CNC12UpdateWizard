@@ -428,18 +428,98 @@ public class App {
                     usbInputsMap.put(lineSPlitINP, lineSplitSV);
                 }
             }
+
+            try {
+                Files.copy(Paths.get("src/Previous_IO.xml"), Paths.get("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml"), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Previous_IO.xml coppied");
+                Document previousIODocument = getDocument("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml");
+                NodeList functionsNodeList = getDocument("C:/"+ directoryName +"/resources/wizard/default/plc/functions.xml").getElementsByTagName("PlcFunction");
+                Element previousIORootElement = getRootElement(previousIODocument);
+                Element inputNode = previousIODocument.createElement("Inputs");
+                Element outputNode = previousIODocument.createElement("Outputs");
+                for (int i = 0; i < functionsNodeList.getLength(); i++) {
+                    Element displayName = (Element) functionsNodeList.item(i);
+                    NodeList nameNodeList = displayName.getElementsByTagName("DisplayName");
+                    String name = nameNodeList.item(0).getTextContent();
+                    Node importNode = functionsNodeList.item(i);
+                    if (inputsMap.containsValue(name)) {
+                        Element definitionNode = previousIODocument.createElement("Definition");
+                        Element IONumberNode = previousIODocument.createElement("IONumber");
+                        IONumberNode.setTextContent("69");
+                        Element isSelectedNode = previousIODocument.createElement("IsSelected");
+                        isSelectedNode.setTextContent("true");
+                        // Element stateNode = previousIODocument.createElement("State");
+                        // stateNode.setTextContent("NormallyClosed");
+                        Node importedNode = previousIODocument.importNode(importNode, true);
+                        
+                        
+
+                        definitionNode.appendChild(importedNode);
+                        definitionNode.appendChild(IONumberNode);
+                        definitionNode.appendChild(isSelectedNode);
+                        // definitionNode.appendChild(stateNode);
+                        inputNode.appendChild(definitionNode);
+
+                        Element newElement = previousIODocument.createElement("Function");
+                        for (int j = 0; j < inputNode.getChildNodes().getLength(); j++) {
+                            Element oldElement = (Element) definitionNode.getChildNodes().item(j);
+                            NamedNodeMap attributes = oldElement.getAttributes();
+                            for (int k = 0; k < attributes.getLength(); k++) {
+                                Node attr = attributes.item(k);
+                                newElement.setAttribute(attr.getNodeName(), attr.getNodeValue());
+                            }
+                            NodeList children = oldElement.getChildNodes();
+                            for (int k = 0; k < children.getLength(); k++) {
+                                Node child = children.item(k);
+                                newElement.appendChild(previousIODocument.importNode(child, true));
+                            }
+                                oldElement.getParentNode().replaceChild(newElement, oldElement);
+                                // definitionNode.appendChild(newElement);
+                        }
+                    }
+                }
+                // for (int i = 0; i < functionsNodeList.getLength(); i++) {
+                //     Element displayName = (Element) functionsNodeList.item(i);
+                //     NodeList nameNodeList = displayName.getElementsByTagName("DisplayName");
+                //     String name = nameNodeList.item(0).getTextContent();
+                //     Node importNode = functionsNodeList.item(i);
+                //     if (outputsMap.containsValue(name)) {
+                //         Element definitionNode = previousIODocument.createElement("Definition");
+                //         Element IONumberNode = previousIODocument.createElement("IONumber");
+                //         IONumberNode.setTextContent("69");
+                //         Element isSelectedNode = previousIODocument.createElement("IsSelected");
+                //         isSelectedNode.setTextContent("true");
+                //         // Element stateNode = previousIODocument.createElement("State");
+                //         // stateNode.setTextContent("NormallyClosed");
+                //         Node importedNode = previousIODocument.importNode(importNode, true);
+
+                //         definitionNode.appendChild(importedNode);
+                //         definitionNode.appendChild(IONumberNode);
+                //         definitionNode.appendChild(isSelectedNode);
+                //         // definitionNode.appendChild(stateNode);
+                //         outputNode.appendChild(definitionNode);
+                //     }
+                // }
+                previousIORootElement.appendChild(inputNode);
+                previousIORootElement.appendChild(outputNode);
+                writeToXml("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml", previousIODocument);
+            } catch (Exception e) {
+                System.out.println("Exception thrown while copying IO preset file");
+                System.out.println(e);
+            }
+
             System.out.println("--INPUTS--");
             for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
                 System.out.println(entry.getKey() + " " + entry.getValue());
             }
-            System.out.println("--OUTPUTS--");
-            for (Map.Entry<String, String> entry : outputsMap.entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
-            System.out.println("--USB INPUTS--");
-            for (Map.Entry<String, String> entry : usbInputsMap.entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
+            // System.out.println("--OUTPUTS--");
+            // for (Map.Entry<String, String> entry : outputsMap.entrySet()) {
+            //     System.out.println(entry.getKey() + " " + entry.getValue());
+            // }
+            // System.out.println("--USB INPUTS--");
+            // for (Map.Entry<String, String> entry : usbInputsMap.entrySet()) {
+            //     System.out.println(entry.getKey() + " " + entry.getValue());
+            // }
             scanner.close();
         } catch (Exception e) {
             System.out.println("Exception thrown while parsing source file");
@@ -544,10 +624,10 @@ public class App {
             System.out.println("Exception thrown while setting raw version");
             System.out.println(e);
         }
-        if (softwareVersionSplit.length == 5) {
-            return softwareVersionSplit[2];
-        } else {
+        if (softwareVersionSplit[0].equals("ACORN")) {
             return softwareVersionSplit[3];
+        } else {
+            return softwareVersionSplit[2];
         }
     }
 
