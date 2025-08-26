@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.frogman650.App",
+            "vmArgs": "--module-path C:\\Users\\Lucas\\Downloads\\openjfx-17.0.16_windows-x64_bin-sdk\\javafx-sdk-17.0.16\\lib --add-modules javafx.controls,javafx.fxml",
+            "projectName": "cnc12directoryrenamer"
+        }
+    ]
+}
