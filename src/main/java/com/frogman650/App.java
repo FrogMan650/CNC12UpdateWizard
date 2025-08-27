@@ -36,402 +36,43 @@ public class App {
     public static double oldversionCombined;
     public static double newversionCombined;
     public static String boardKeyA;
-    public static String sourceFile;
     public static void main(String[] args) throws Exception {
-        //Check for CNC12 directories
-        if (checkDirectory("cncm")) {
-            directoryName = "cncm"; 
-            System.out.println("Software: Mill");
-        }
-        if (checkDirectory("cnct")) {
-            if (directoryName != "") {
-                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
-            }
-            directoryName = "cnct"; 
-            System.out.println("Software: Lathe");
-        }
-        if (checkDirectory("cncr")) {
-            if (directoryName != "") {
-                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
-            }
-            directoryName = "cncr"; 
-            System.out.println("Software: Router");
-        }
-        if (checkDirectory("cncp")) {
-            if (directoryName != "") {
-                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
-            }
-            directoryName = "cncp"; 
-            System.out.println("Software: Plasma");
-        }
-        if (checkDirectory("cncl")) {
-            if (directoryName != "") {
-                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
-            }
-            directoryName = "cncl"; 
-            System.out.println("Software: Laser");
-        }
-        if (directoryName.equals("")) {
-            throw new IllegalArgumentException("No directory combination found");
-        }
-        if (directoryName.equals("cnct")) {
-            directoryFiles = "cnct";
-        } else {
-            directoryFiles = "cncm";
-        }
-
-        //Set file and directory paths
-        String oldParmFile = "C:/old " + directoryName + "/" + directoryFiles + ".prm.xml";
-        String newParmFile = "C:/" + directoryName + "/" + directoryFiles + ".prm.xml";
-        String oldCfgFile = "C:/old " + directoryName + "/" + directoryFiles + "cfg.xml";
-        String newCfgFile = "C:/" + directoryName + "/" + directoryFiles + "cfg.xml";
-        String oldWizardSettingsFile = "C:/old " + directoryName + "/wizardsettings.xml";
-        String newWizardSettingsFile = "C:/" + directoryName + "/wizardsettings.xml";
-        String oldOptionsFile = "C:/old " + directoryName + "/resources/vcp/options.xml";
-        String newOptionsFile = "C:/" + directoryName + "/resources/vcp/options.xml";
-        String oldHomeFile = "C:/old " + directoryName + "/" + directoryFiles + ".hom";
-        String newHomeFile = "C:/" + directoryName + "/" + directoryFiles + ".hom";
-        String oldCarouselSettingsFile = "C:/old " + directoryName + "/FixedCarouselSettings.xml";
-        String newCarouselSettingsFile = "C:/" + directoryName + "/FixedCarouselSettings.xml";
-        String oldRackMountFile = "C:/old " + directoryName + "/RackMountBin.xml";
-        String newRackMountFile = "C:/" + directoryName + "/RackMountBin.xml";
-        String oldPlasmaConfigFile = "C:/old " + directoryName + "/PlasmaConfigurations.xml";
-        String newPlasmaConfigFile = "C:/" + directoryName + "/PlasmaConfigurations.xml";
-        String oldToolChangeMacroFile;
-        String newToolChangeMacroFile;
-        if (directoryName.equals("cnct")) {
-            oldToolChangeMacroFile = "C:/old " + directoryFiles + "/cnctch.mac";
-            newToolChangeMacroFile = "C:/" + directoryFiles + "/cnctch.mac";
-        } else {
-            oldToolChangeMacroFile = "C:/old " + directoryFiles + "/mfunc6.mac";
-            newToolChangeMacroFile = "C:/" + directoryFiles + "/mfunc6.mac";
-        }
-
-        //Open documents
-        Document newParmDocument = getDocument(newParmFile);
-        Document newCfgDocument = getDocument(newCfgFile);
-        Document newWizardSettingsDocument = getDocument(newWizardSettingsFile);
-        Document newOptionsDocument = getDocument(newOptionsFile);
-        Document newCarouselSettingsDocument = null;
-        Document newRackMountDocument = null;
-        Document newPlasmaConfigDocument = null;
-        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
-            newCarouselSettingsDocument = getDocument(newCarouselSettingsFile);
-            newRackMountDocument = getDocument(newRackMountFile);
-        }
-        if (directoryName.equals("cncp")) {
-            newPlasmaConfigDocument = getDocument(newPlasmaConfigFile);
-        }
-
-        //Get board, software versions, and KeyA
-        oldversionRaw = setRawVersion(oldParmFile);
-        newversionRaw = setRawVersion(newParmFile);
-        oldversionCombined = getVersionCombined(oldversionRaw);
-        newversionCombined = getVersionCombined(newversionRaw);
-        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
-            newversionCombined = 540;
-        }
-        boardKeyA = getKeyA(newCfgFile);
-        board = getBoardType();
-
+        setDirectoryName();
+        setBoardSoftwareInfo();
+        System.out.println("Version: " + oldversionRaw + " -> " + newversionRaw);
         System.out.println("Board: " + board);
         System.out.println("KeyA: " + boardKeyA);
-        System.out.println("Version: " + oldversionRaw + " -> " + newversionRaw);
-        
-        //License file
-        try {
-            Files.copy(Paths.get("C:/old "+ directoryName +"/license.dat"), Paths.get("C:/"+ directoryName +"/license.dat"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("License DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying license file");
-            System.out.println(e);
-        }
-        
-        //Offset library file
-        if (!directoryName.equals("cnct")) {
-            try {
-                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ol"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ol"), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Offset library DONE");
-            } catch (Exception e) {
-                System.out.println("Exception thrown while copying tool library file");
-                System.out.println(e);
-            }
-        }
-        
-        //Carousel settings file
-        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
-            try {
-                NodeList oldCarouselNodeList = getRootElement(getDocument(oldCarouselSettingsFile)).getChildNodes();
-                NodeList newCarouselNodeList = getRootElement(newCarouselSettingsDocument).getChildNodes();
-                for (int i = 0; i < newCarouselNodeList.getLength(); i ++) {
-                    for (int j = 0; j < oldCarouselNodeList.getLength(); j ++) {
-                        if (newCarouselNodeList.item(i).getNodeName().equals(oldCarouselNodeList.item(j).getNodeName())) {
-                            newCarouselNodeList.item(i).setTextContent(oldCarouselNodeList.item(j).getTextContent());
-                        }
-                    }
-                }
-                writeToXml(newCarouselSettingsFile, newCarouselSettingsDocument);
-                System.out.println("Carousel settings DONE");
-            } catch (Exception e) {
-                System.out.println("Exception thrown while parsing carousel file");
-                System.out.println(e);
-            }
-        }
-        
-        //Plasma config file
-        if (directoryName.equals("cncp")) {
-            try {
-                File file = new File("C:/old " + directoryName + "/PlasmaConfigurations.txt");
-                NodeList newPlasmaConfigNodeList = getRootElement(newPlasmaConfigDocument).getChildNodes();
-                if (file.exists()) {
-                    Scanner scanner = new Scanner(file);
-                    int counter = 0;
-                    while (scanner.hasNextLine()) {
-                        newPlasmaConfigNodeList.item(counter).setTextContent(scanner.nextLine());
-                        counter ++;
-                    }
-                    scanner.close();
-                } else {
-                    NodeList oldPlasmaConfigNodeList = getRootElement(getDocument(oldPlasmaConfigFile)).getChildNodes();
-                    for (int i = 0; i < newPlasmaConfigNodeList.getLength(); i ++) {
-                        for (int j = 0; j < oldPlasmaConfigNodeList.getLength(); j ++) {
-                            if (newPlasmaConfigNodeList.item(i).getNodeName().equals(oldPlasmaConfigNodeList.item(j).getNodeName())) {
-                                newPlasmaConfigNodeList.item(i).setTextContent(oldPlasmaConfigNodeList.item(j).getTextContent());
-                            }
-                        }
-                    }
-                }
-                writeToXml(newPlasmaConfigFile, newPlasmaConfigDocument);
-                System.out.println("Plasma config DONE");
-            } catch (Exception e) {
-                System.out.println("Exception thrown while parsing plasma config file");
-                System.out.println(e);
-            }
-        }
-        
-        //Rack mount settings file
-        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
-            try {
-                NodeList oldRackMountNodeList = getRootElement(getDocument(oldRackMountFile)).getChildNodes();
-                NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
-                for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
-                    for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
-                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() == 1 && newRackMountNodeList.item(j).getChildNodes().getLength() == 1) {
-                            if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName())) {
-                                newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
-                            }
-                        }
-                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() > 1 && newRackMountNodeList.item(j).getChildNodes().getLength() > 1 && 
-                        oldRackMountNodeList.item(i).getFirstChild().getTextContent().equals(newRackMountNodeList.item(j).getFirstChild().getTextContent())) {
-                            for (int k = 0; k < oldRackMountNodeList.item(i).getChildNodes().getLength(); k++) {
-                                for (int l = 0; l < newRackMountNodeList.item(j).getChildNodes().getLength(); l++) {
-                                    if (oldRackMountNodeList.item(i).getChildNodes().item(k).getNodeName().equals(newRackMountNodeList.item(j).getChildNodes().item(l).getNodeName())) {
-                                        newRackMountNodeList.item(j).getChildNodes().item(l).setTextContent(oldRackMountNodeList.item(i).getChildNodes().item(k).getTextContent());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                writeToXml(newRackMountFile, newRackMountDocument);
-                System.out.println("Rack mount settings DONE");
-            } catch (Exception e) {
-                System.out.println("Exception thrown while parsing rack mount file");
-                System.out.println(e);
-            }
-        }
+        copyLicense();
+        copyOffsetLibrary();
+        transferCarouselSettings();
+        transferPlasmaConfig();
+        transferRackMount();
+        copyWCS();
+        copyStats();
+        copyToolLibrary();
+        transferOptions();
+        transferWizardSettings();
+        transferConfig();
+        defineParams();
+        transferParms();
+        copyHomeFile();
+        copyToolChangeFile();
+        getIO();
+        createPresetIO();
+        usbBobInputs();
+        System.out.println("*Update Complete*");
+    }
 
-        //WCS file
-        try {
-            Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".wcs"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".wcs"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("WCS DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying WCS file");
-            System.out.println(e);
+    public static void usbBobInputs() {
+        if (usbInputsMap.size() > 0) {
+            System.out.println("*USB-BOB Inputs*");
+            for (Map.Entry<String, String> entry : usbInputsMap.entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
         }
+    }
 
-        //Stats file
-        try {
-            Files.copy(Paths.get("C:/old "+ directoryName +"/mt.stats"), Paths.get("C:/"+ directoryName +"/mt.stats"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Stats DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying Stats file");
-            System.out.println(e);
-        }
-        
-        //Tool library file
-        try {
-            if (directoryName.equals("cnct")) {
-                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ttl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ttl"), StandardCopyOption.REPLACE_EXISTING);
-            } else {
-                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".tl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".tl"), StandardCopyOption.REPLACE_EXISTING);
-            }
-            System.out.println("Tool library DONE");
-            
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying tool library file");
-            System.out.println(e);
-        }
-        
-        //VCP Options file
-        try {
-            NodeList oldOptionsNodeList = getRootElement(getDocument(oldOptionsFile)).getElementsByTagName("VcpOption");
-            NodeList newOptionsNodeList = getRootElement(newOptionsDocument).getElementsByTagName("VcpOption");
-            for(int i = 0; i < oldOptionsNodeList.getLength(); i ++) {
-                for(int j = 0; j < newOptionsNodeList.getLength(); j ++) {
-                    String oldOptionNodeText = oldOptionsNodeList.item(i).getChildNodes().item(0).getTextContent();
-                    String newOptionNodeText = newOptionsNodeList.item(j).getChildNodes().item(0).getTextContent();
-                    if (oldOptionNodeText.equals(newOptionNodeText)) {
-                        newOptionsNodeList.item(j).getChildNodes().item(1).setTextContent(oldOptionsNodeList.item(i).getChildNodes().item(1).getTextContent());
-                        break;
-                    }
-                }
-            }
-            writeToXml(newOptionsFile, newOptionsDocument);
-            System.out.println("VCP options DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown during options.xml parsing");
-            System.out.println(e);
-        }
-
-        //Wizard settings file
-        try {
-            NodeList oldWizardSettingsNodeList = getRootElement(getDocument(oldWizardSettingsFile)).getChildNodes();
-            NodeList newWizardSettingsNodeList = getRootElement(newWizardSettingsDocument).getChildNodes();
-            for (int i = oldWizardSettingsNodeList.getLength()-1; i >= 0; i --) {
-                for (int j = 0; j < newWizardSettingsNodeList.getLength(); j ++) {
-                    if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
-                        Element element = (Element) oldWizardSettingsNodeList.item(i);
-                        Element element2 = (Element) newWizardSettingsNodeList.item(j);
-                        element2.setAttribute("value", element.getAttribute("value"));
-                    }
-                }
-            }
-            writeToXml(newWizardSettingsFile, newWizardSettingsDocument);
-            System.out.println("Wizard settings DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown during wizardsettings.xml parsing");
-            System.out.println(e);
-        }
-
-        //Config settings file
-        try {
-            NodeList oldCfgNodeList = getRootElement(getDocument(oldCfgFile)).getChildNodes();
-            NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
-            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
-            }
-            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
-                Element element = (Element) oldCfgNodeList.item(i);
-                Element element2 = (Element) newCfgNodeList.item(i);
-                NamedNodeMap attributes = element.getAttributes();
-                NamedNodeMap attributes2 = element2.getAttributes();
-                for (int j = 0; j < attributes.getLength(); j++) {
-                    for (int k = 0; k < attributes2.getLength(); k++) {
-                        if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
-                        element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
-                        break;
-                        }
-                    }
-                }
-            }
-            writeToXml(newCfgFile, newCfgDocument);
-            System.out.println("Config DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown during config file parsing");
-            System.out.println(e);
-        }
-        
-        //Define params to check by version
-        NodeList oldVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
-        NodeList newVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
-        for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
-            oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
-        }
-        for (int i = 0; i < newVersionNodeList.getLength(); i++) {
-            newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
-        }
-
-        //Parm values file
-        try {
-            NodeList oldParmNodeList = getRootElement(getDocument(oldParmFile)).getElementsByTagName("value");
-            NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
-            for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
-                Node oldParmNode = oldParmNodeList.item(i);
-                Node newParmNode = newParmNodeList.item(i);
-                Element element = (Element) oldParmNode;
-                String text = element.getTextContent();
-                if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
-                    newParmNode.setTextContent(text);
-                    //newParmNode.setTextContent("69");//for testing
-                }
-            }
-            writeToXml(newParmFile, newParmDocument);
-            System.out.println("Parameters DONE");
-        } catch (Exception e) {
-            System.out.println("Exception thrown during param file parsing");
-            System.out.println(e);
-        }
-
-        //Homing file
-        try {
-            Node homingFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("HomingFileType").item(0);
-            Element homingElement = (Element) homingFileNode;
-            if (homingElement.getAttribute("value").equals("Custom")) {
-                Files.copy(Paths.get(oldHomeFile), Paths.get(newHomeFile), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Homing file DONE");
-            }
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying homing file");
-            System.out.println(e);
-        }
-        
-        //Tool change file
-        try {
-            Node toolChangeFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("CustomToolChangeMacro").item(0);
-            Element toolChangeElement = (Element) toolChangeFileNode;
-            if (toolChangeElement.getAttribute("value").equals("True")) {
-                Files.copy(Paths.get(oldToolChangeMacroFile), Paths.get(newToolChangeMacroFile), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Tool change macro DONE");
-            }
-        } catch (Exception e) {
-            System.out.println("Exception thrown while copying tool change macro");
-            System.out.println(e);
-        }
-
-        //Inputs, Outputs, and USB-BOB Inputs
-        try {
-            File file = new File("C:/old " + directoryName + "/mpu.plc");
-            Scanner scanner = new Scanner(file);
-            String region = "";
-            Boolean record = false;
-            int counter = 0;
-            while (counter < 3 && scanner.hasNext()) {
-                String line = scanner.nextLine();
-                if (line.contains("#endregion") && record) {
-                    counter ++;
-                    record = false;
-                }else if (line.contains("#wizardregion Inputs")) {
-                    record = true;
-                    region = "inputs";
-                } else if (line.contains("#wizardregion Outputs")) {
-                    record = true;
-                    region = "outputs";
-                } else if (line.contains("#wizardregion UsbInput")) {
-                    record = true;
-                    region = "usbinputs";
-                } else if (record && region.equals("inputs")) {
-                    inputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
-                } else if (record && region.equals("outputs")) {
-                    outputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
-                } else if (record && region.equals("usbinputs")) {
-                    String lineSplitSV = trimReplaceSplit(line)[3].split("_")[1];
-                    String lineSPlitINP = trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-2] + 
-                    trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-1];
-                    usbInputsMap.put(lineSPlitINP, lineSplitSV);
-                }
-            }
-            scanner.close();
-
+    public static void createPresetIO() {
             try {
                 Files.copy(Paths.get("src/main/resources/com/frogman650/Previous_IO.xml"), Paths.get("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml"), StandardCopyOption.REPLACE_EXISTING);
                 Document previousIODocument = getDocument("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml");
@@ -453,10 +94,7 @@ public class App {
                         // Element stateNode = previousIODocument.createElement("State");
                         // stateNode.setTextContent("NormallyClosed");
                         Node importedNode = previousIODocument.importNode(importNode, true);
-                        
-                        
                         definitionNode.appendChild(importedNode);
-
                         Element newElement = previousIODocument.createElement("Function");
                         for (int j = 0; j < definitionNode.getChildNodes().getLength(); j++) {
                             Element oldElement = (Element) definitionNode.getChildNodes().item(j);
@@ -487,10 +125,7 @@ public class App {
                         // Element stateNode = previousIODocument.createElement("State");
                         // stateNode.setTextContent("NormallyClosed");
                         Node importedNode = previousIODocument.importNode(importNode, true);
-                        
-                        
                         definitionNode.appendChild(importedNode);
-
                         Element newElement = previousIODocument.createElement("Function");
                         for (int j = 0; j < definitionNode.getChildNodes().getLength(); j++) {
                             Element oldElement = (Element) definitionNode.getChildNodes().item(j);
@@ -517,30 +152,369 @@ public class App {
                 previousIORootElement.appendChild(outputNode);
                 writeToXml("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml", previousIODocument);
             } catch (Exception e) {
-                System.out.println("Exception thrown while copying IO preset file");
-                System.out.println(e);
+                System.out.println("Exception thrown while creating IO preset\n" + e);
             }
-
-            // System.out.println("--INPUTS--");
-            // for (Map.Entry<String, String> entry : inputsMap.entrySet()) {
-            //     System.out.println(entry.getKey() + " " + entry.getValue());
-            // }
-            // System.out.println("--OUTPUTS--");
-            // for (Map.Entry<String, String> entry : outputsMap.entrySet()) {
-            //     System.out.println(entry.getKey() + " " + entry.getValue());
-            // }
-            // System.out.println("--USB INPUTS--");
-            // for (Map.Entry<String, String> entry : usbInputsMap.entrySet()) {
-            //     System.out.println(entry.getKey() + " " + entry.getValue());
-            // }
-        } catch (Exception e) {
-            System.out.println("Exception thrown while parsing source file");
-            System.out.println(e);
+            System.out.println("IO preset *DONE*");
         }
 
+    public static void getIO() {
+        try {
+            File file = new File("C:/old " + directoryName + "/mpu.plc");
+            Scanner scanner = new Scanner(file);
+            String region = "";
+            Boolean record = false;
+            int counter = 0;
+            while (counter < 3 && scanner.hasNext()) {
+                String line = scanner.nextLine();
+                if (line.contains("#endregion") && record) {
+                    counter ++;
+                    record = false;
+                }else if (line.contains("#wizardregion Inputs")) {
+                    record = true;
+                    region = "inputs";
+                } else if (line.contains("#wizardregion Outputs")) {
+                    record = true;
+                    region = "outputs";
+                } else if (line.contains("#wizardregion UsbInput")) {
+                    record = true;
+                    region = "usbinputs";
+                } else if (record && region.equals("inputs")) {
+                    inputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
+                } else if (record && region.equals("outputs")) {
+                    outputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
+                } else if (record && region.equals("usbinputs")) {
+                    String lineSplitSV = trimReplaceSplit(line)[1].split("_")[1];
+                    String lineSPlitINP = trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-2] + 
+                    trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-1];
+                    usbInputsMap.put(lineSPlitINP, lineSplitSV);
+                }
+            }
+            scanner.close();
+        } catch (Exception e) {
+            System.out.println("Exception thrown while getting IO\n" + e);
+            }
+            System.out.println("Getting IO *DONE*");
+        }
 
-        //FINISHED
-        System.out.println("*Update Complete*");
+    public static void copyToolChangeFile() {
+        try {
+            Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
+            Node toolChangeFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("CustomToolChangeMacro").item(0);
+            Element toolChangeElement = (Element) toolChangeFileNode;
+            if (toolChangeElement.getAttribute("value").equals("True")) {
+                Files.copy(Paths.get(directoryName.equals("cnct") ? "C:/old " + directoryFiles + "/cnctch.mac" : "C:/old " + directoryFiles + "/mfunc6.mac"), 
+                Paths.get(directoryName.equals("cnct") ? "C:/" + directoryFiles + "/cnctch.mac" : "C:/" + directoryFiles + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying tool change macro\n" + e);
+        }
+        System.out.println("Tool change macro *DONE*");
+    }
+
+    public static void copyHomeFile() {
+        try {
+            Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
+            Node homingFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("HomingFileType").item(0);
+            Element homingElement = (Element) homingFileNode;
+            if (homingElement.getAttribute("value").equals("Custom")) {
+                Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
+                Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying home file\n" + e);
+        }
+        System.out.println("Home file *DONE*");
+    }
+
+    public static void transferParms() {
+        try {
+            Document newParmDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
+            NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
+            NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
+            for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
+                Node oldParmNode = oldParmNodeList.item(i);
+                Node newParmNode = newParmNodeList.item(i);
+                Element element = (Element) oldParmNode;
+                String text = element.getTextContent();
+                if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
+                    newParmNode.setTextContent(text);
+                    //newParmNode.setTextContent("69");//for testing
+                }
+            }
+            writeToXml("C:/" + directoryName + "/" + directoryFiles + ".prm.xml", newParmDocument);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while transfering parameters");
+        }
+        System.out.println("Parameters *DONE*");
+    }
+
+    public static void defineParams() {
+        NodeList oldVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
+        NodeList newVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
+        for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
+            oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
+        }
+        for (int i = 0; i < newVersionNodeList.getLength(); i++) {
+            newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
+        }
+        System.out.println("Defining params *DONE*");
+    }
+
+    public static void transferConfig() {
+        try {
+            Document newCfgDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml");
+            NodeList oldCfgNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getChildNodes();
+            NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
+            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+            }
+            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+                Element element = (Element) oldCfgNodeList.item(i);
+                Element element2 = (Element) newCfgNodeList.item(i);
+                NamedNodeMap attributes = element.getAttributes();
+                NamedNodeMap attributes2 = element2.getAttributes();
+                for (int j = 0; j < attributes.getLength(); j++) {
+                    for (int k = 0; k < attributes2.getLength(); k++) {
+                        if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
+                        element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
+                        break;
+                        }
+                    }
+                }
+            }
+            writeToXml("C:/" + directoryName + "/" + directoryFiles + "cfg.xml", newCfgDocument);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while transfering config file\n" + e);
+        }
+        System.out.println("Config *DONE*");
+    }
+
+    public static void transferWizardSettings() {
+        try {
+            Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
+            NodeList oldWizardSettingsNodeList = getRootElement(getDocument("C:/old " + directoryName + "/wizardsettings.xml")).getChildNodes();
+            NodeList newWizardSettingsNodeList = getRootElement(newWizardSettingsDocument).getChildNodes();
+            for (int i = oldWizardSettingsNodeList.getLength()-1; i >= 0; i --) {
+                for (int j = 0; j < newWizardSettingsNodeList.getLength(); j ++) {
+                    if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
+                        Element element = (Element) oldWizardSettingsNodeList.item(i);
+                        Element element2 = (Element) newWizardSettingsNodeList.item(j);
+                        element2.setAttribute("value", element.getAttribute("value"));
+                    }
+                }
+            }
+            writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while transfering wizard settings\n" + e);
+        }
+        System.out.println("Wizard settings *DONE*");
+    }
+
+    public static void transferOptions() {
+        try {
+            Document newOptionsDocument = getDocument("C:/" + directoryName + "/resources/vcp/options.xml");
+            NodeList oldOptionsNodeList = getRootElement(getDocument("C:/old " + directoryName + "/resources/vcp/options.xml")).getElementsByTagName("VcpOption");
+            NodeList newOptionsNodeList = getRootElement(newOptionsDocument).getElementsByTagName("VcpOption");
+            for(int i = 0; i < oldOptionsNodeList.getLength(); i ++) {
+                for(int j = 0; j < newOptionsNodeList.getLength(); j ++) {
+                    String oldOptionNodeText = oldOptionsNodeList.item(i).getChildNodes().item(0).getTextContent();
+                    String newOptionNodeText = newOptionsNodeList.item(j).getChildNodes().item(0).getTextContent();
+                    if (oldOptionNodeText.equals(newOptionNodeText)) {
+                        newOptionsNodeList.item(j).getChildNodes().item(1).setTextContent(oldOptionsNodeList.item(i).getChildNodes().item(1).getTextContent());
+                        break;
+                    }
+                }
+            }
+            writeToXml("C:/" + directoryName + "/resources/vcp/options.xml", newOptionsDocument);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while transfering VCP options\n" + e);
+        }
+        System.out.println("VCP options *DONE*");
+    }
+
+    public static void copyToolLibrary() {
+        try {
+            if (directoryName.equals("cnct")) {
+                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ttl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ttl"), StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".tl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".tl"), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying tool library\n" + e);
+        }
+        System.out.println("Tool library *DONE*");
+    }
+
+    public static void copyStats() {
+        try {
+            Files.copy(Paths.get("C:/old "+ directoryName +"/mt.stats"), Paths.get("C:/"+ directoryName +"/mt.stats"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying stats file\n" + e);
+        }
+        System.out.println("Stats *DONE*");
+    }
+
+    public static void copyWCS() {
+        try {
+            Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".wcs"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".wcs"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying WCS file\n" + e);
+        }
+        System.out.println("WCS *DONE*");
+    }
+
+    public static void transferRackMount() {
+        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
+            try {
+                Document newRackMountDocument = getDocument("C:/" + directoryName + "/RackMountBin.xml");
+                NodeList oldRackMountNodeList = getRootElement(getDocument("C:/old " + directoryName + "/RackMountBin.xml")).getChildNodes();
+                NodeList newRackMountNodeList = getRootElement(newRackMountDocument).getChildNodes();
+                for (int i = 0; i < oldRackMountNodeList.getLength(); i++) {
+                    for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
+                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() == 1 && newRackMountNodeList.item(j).getChildNodes().getLength() == 1) {
+                            if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName())) {
+                                newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
+                            }
+                        }
+                        if (oldRackMountNodeList.item(i).getChildNodes().getLength() > 1 && newRackMountNodeList.item(j).getChildNodes().getLength() > 1 && 
+                        oldRackMountNodeList.item(i).getFirstChild().getTextContent().equals(newRackMountNodeList.item(j).getFirstChild().getTextContent())) {
+                            for (int k = 0; k < oldRackMountNodeList.item(i).getChildNodes().getLength(); k++) {
+                                for (int l = 0; l < newRackMountNodeList.item(j).getChildNodes().getLength(); l++) {
+                                    if (oldRackMountNodeList.item(i).getChildNodes().item(k).getNodeName().equals(newRackMountNodeList.item(j).getChildNodes().item(l).getNodeName())) {
+                                        newRackMountNodeList.item(j).getChildNodes().item(l).setTextContent(oldRackMountNodeList.item(i).getChildNodes().item(k).getTextContent());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                writeToXml("C:/" + directoryName + "/RackMountBin.xml", newRackMountDocument);
+            } catch (Exception e) {
+                System.out.println("Exception thrown while transfering rack mount settings\n" + e);
+            }
+        }
+        System.out.println("Rack mount settings *DONE*");
+    }
+
+    public static void transferPlasmaConfig() {
+        if (directoryName.equals("cncp")) {
+            try {
+                Document newPlasmaConfigDocument = getDocument("C:/" + directoryName + "/PlasmaConfigurations.xml");
+                File file = new File("C:/old " + directoryName + "/PlasmaConfigurations.txt");
+                NodeList newPlasmaConfigNodeList = getRootElement(newPlasmaConfigDocument).getChildNodes();
+                if (file.exists()) {
+                    Scanner scanner = new Scanner(file);
+                    int counter = 0;
+                    while (scanner.hasNextLine()) {
+                        newPlasmaConfigNodeList.item(counter).setTextContent(scanner.nextLine());
+                        counter ++;
+                    }
+                    scanner.close();
+                } else {
+                    NodeList oldPlasmaConfigNodeList = getRootElement(getDocument("C:/old " + directoryName + "/PlasmaConfigurations.xml")).getChildNodes();
+                    for (int i = 0; i < newPlasmaConfigNodeList.getLength(); i ++) {
+                        for (int j = 0; j < oldPlasmaConfigNodeList.getLength(); j ++) {
+                            if (newPlasmaConfigNodeList.item(i).getNodeName().equals(oldPlasmaConfigNodeList.item(j).getNodeName())) {
+                                newPlasmaConfigNodeList.item(i).setTextContent(oldPlasmaConfigNodeList.item(j).getTextContent());
+                            }
+                        }
+                    }
+                }
+                writeToXml("C:/" + directoryName + "/PlasmaConfigurations.xml", newPlasmaConfigDocument);
+            } catch (Exception e) {
+                System.out.println("Exception thrown while transfering plasma config\n" + e);
+            }
+        }
+        System.out.println("Plasma config *DONE*");
+    }
+
+    public static void transferCarouselSettings() {
+        if (directoryName.equals("cncm") || directoryName.equals("cncr")) {
+            try {
+                Document newCarouselSettingsDocument = getDocument("C:/" + directoryName + "/FixedCarouselSettings.xml");
+                NodeList oldCarouselNodeList = getRootElement(getDocument("C:/old " + directoryName + "/FixedCarouselSettings.xml")).getChildNodes();
+                NodeList newCarouselNodeList = getRootElement(newCarouselSettingsDocument).getChildNodes();
+                for (int i = 0; i < newCarouselNodeList.getLength(); i ++) {
+                    for (int j = 0; j < oldCarouselNodeList.getLength(); j ++) {
+                        if (newCarouselNodeList.item(i).getNodeName().equals(oldCarouselNodeList.item(j).getNodeName())) {
+                            newCarouselNodeList.item(i).setTextContent(oldCarouselNodeList.item(j).getTextContent());
+                        }
+                    }
+                }
+                writeToXml("C:/" + directoryName + "/FixedCarouselSettings.xml", newCarouselSettingsDocument);
+            } catch (Exception e) {
+                System.out.println("Exception thrown while transfering carousel settings\n" + e);
+            }
+        }
+        System.out.println("Carousel settings *DONE*");
+    }
+
+    public static void copyOffsetLibrary() {
+        if (!directoryName.equals("cnct")) {
+            try {
+                Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ol"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ol"), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                System.out.println("Exception thrown while copying offset library\n" + e);
+            }
+        }
+        System.out.println("Offset library *DONE*");
+    }
+
+    public static void copyLicense() {
+        try {
+            File file = new File("C:/old "+ directoryName +"/license.dat");
+            if (file.exists()) {
+            Files.copy(Paths.get("C:/old "+ directoryName +"/license.dat"), Paths.get("C:/"+ directoryName +"/license.dat"), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception thrown while copying license\n" + e);
+        }
+        System.out.println("License *DONE*");
+    }
+
+    public static void setBoardSoftwareInfo() {
+        oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
+        newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
+        oldversionCombined = getVersionCombined(oldversionRaw);
+        newversionCombined = getVersionCombined(newversionRaw);
+        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
+            newversionCombined = 540;
+        }
+        boardKeyA = getKeyA("C:/" + directoryName + "/" + directoryFiles + "cfg.xml");
+        board = getBoardType();
+    }
+
+    public static void setDirectoryName() {
+        if (checkDirectory("cncm")) {
+            directoryName = "cncm"; 
+        }
+        if (checkDirectory("cnct")) {
+            if (directoryName != "") {
+                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
+            }
+            directoryName = "cnct"; 
+        }
+        if (checkDirectory("cncr")) {
+            if (directoryName != "") {
+                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
+            }
+            directoryName = "cncr"; 
+        }
+        if (checkDirectory("cncp")) {
+            if (directoryName != "") {
+                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
+            }
+            directoryName = "cncp"; 
+        }
+        if (checkDirectory("cncl")) {
+            if (directoryName != "") {
+                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
+            }
+            directoryName = "cncl"; 
+        }
+        if (directoryName.equals("")) {
+            throw new IllegalArgumentException("No directory combination found");
+        }
+        directoryFiles = directoryName.equals("cnct") ? "cnct" : "cncm";
     }
 
     public static String getKeyA(String filePath) {
@@ -550,8 +524,7 @@ public class App {
             keyA = getRootElement(getDocument(filePath)).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
         } catch (Exception e) {
-            System.out.println("Exception thrown while getting KeyA");
-            System.out.println(e);
+            System.out.println("Exception thrown while getting KeyA\n" + e);
         }
         return keyASplit[keyASplit.length-1];
     }
@@ -594,8 +567,7 @@ public class App {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new File(filePath));
         } catch (Exception e) {
-            System.out.println("Exception thrown while getting document from: " + filePath);
-            System.out.println(e);
+            System.out.println("Exception thrown while getting document from: " + filePath + "\n" + e);
         }
         return document;
     }
@@ -605,8 +577,7 @@ public class App {
         try {
             rootElement = document.getDocumentElement();
         } catch (Exception e) {
-            System.out.println("Exception thrown while getting root element from document");
-            System.out.println(e);
+            System.out.println("Exception thrown while getting root element from document\n" + e);
         }
             return trimEmptyElements(rootElement);
     }
@@ -619,8 +590,7 @@ public class App {
             StreamResult docResult = new StreamResult(new File(filePath));
             transformer.transform(docSource, docResult);
         } catch (Exception e) {
-            System.out.println("Exception thrown while writing to file: " + filePath);
-            System.out.println(e);
+            System.out.println("Exception thrown while writing to file: " + filePath + "\n" + e);
         }
     }
 
@@ -633,8 +603,7 @@ public class App {
             softwareVersion = softwareVersionNodeList.item(0).getTextContent();
             softwareVersionSplit = softwareVersion.split(" ");
         } catch (Exception e) {
-            System.out.println("Exception thrown while setting raw version");
-            System.out.println(e);
+            System.out.println("Exception thrown while setting raw version\n" + e);
         }
         if (softwareVersionSplit[0].equals("ACORN")) {
             return softwareVersionSplit[3];
@@ -648,8 +617,7 @@ public class App {
         try {
             versionSplitSplit = rawVersion.split("\\.");
         } catch (Exception e) {
-            System.out.println("Exception thrown while getting combined version");
-            System.out.println(e);
+            System.out.println("Exception thrown while getting combined version\n" + e);
         }
         if (versionSplitSplit.length == 2) {
             return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
@@ -673,8 +641,7 @@ public class App {
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             newBoard = boardVersion.split("_")[2];
         } catch (Exception e) {
-            System.out.println("Exception thrown while setting board type");
-            System.out.println(e);
+            System.out.println("Exception thrown while setting board type\n" + e);
         }
         if (oldBoard.equals(newBoard)) {
             return newBoard;
