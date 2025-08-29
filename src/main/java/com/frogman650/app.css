@@ -1,0 +1,13 @@
+#anchor_pane {
+    -fx-background-color:"#f7e6cd";
+}
+
+#primary_text {
+    -fx-font-size: 30px;
+    -fx-font-family: Arial, Helvetica, sans-serif;
+}
+
+#secondary_text, #body_text {
+    -fx-font-size: 20px;
+    -fx-font-family: Arial, Helvetica, sans-serif;
+}

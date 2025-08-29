@@ -16,13 +16,24 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class App {
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+public class App extends Application {
     public static ArrayList<Integer> oldParamsToCheck = new ArrayList<>();
     public static ArrayList<Integer> newParamsToCheck = new ArrayList<>();
     public static Map<String, String> inputsMap = new LinkedHashMap<>();
@@ -37,31 +48,44 @@ public class App {
     public static double newversionCombined;
     public static String boardKeyA;
     public static void main(String[] args) throws Exception {
-        setDirectoryName();
-        setBoardSoftwareInfo();
-        System.out.println("Version: " + oldversionRaw + " -> " + newversionRaw);
-        System.out.println("Board: " + board);
-        System.out.println("KeyA: " + boardKeyA);
-        copyLicense();
-        copyOffsetLibrary();
-        transferCarouselSettings();
-        transferPlasmaConfig();
-        transferRackMount();
-        copyWCS();
-        copyStats();
-        copyToolLibrary();
-        transferOptions();
-        transferWizardSettings();
-        transferConfig();
-        defineParams();
-        transferParms();
-        copyHomeFile();
-        copyToolChangeFile();
-        getIO();
-        createPresetIO();
-        usbBobInputs();
-        System.out.println("*Update Complete*");
+        launch(args);
+        // setDirectoryName();X
+        // setBoardSoftwareInfo();X
+        // System.out.println("Version: " + oldversionRaw + " -> " + newversionRaw);
+        // System.out.println("Board: " + board);
+        // System.out.println("KeyA: " + boardKeyA);
+        // copyLicense();X
+        // copyOffsetLibrary();
+        // transferCarouselSettings();
+        // transferPlasmaConfig();
+        // transferRackMount();
+        // copyWCS();
+        // copyStats();
+        // copyToolLibrary();
+        // transferOptions();
+        // transferWizardSettings();
+        // transferConfig();
+        // defineParams();
+        // transferParms();
+        // copyHomeFile();
+        // copyToolChangeFile();
+        // getIO();X
+        // createPresetIO();X
+        // usbBobInputs();
+        // System.out.println("*Update Complete*");
     }
+
+    //1. rename old directory
+    //2. install new version
+    //3. start new version to load firmware
+    //4. get directory name
+    //5. get board and version 
+    //6. copy license
+    //7. getIO
+    //8. create preset IO file
+    //9. open CNC12 and wizard
+    //10. apply IO preset
+    //11. write settings
 
     public static void usbBobInputs() {
         if (usbInputsMap.size() > 0) {
@@ -423,8 +447,8 @@ public class App {
             } catch (Exception e) {
                 System.out.println("Exception thrown while transfering plasma config\n" + e);
             }
+            System.out.println("Plasma config *DONE*");
         }
-        System.out.println("Plasma config *DONE*");
     }
 
     public static void transferCarouselSettings() {
@@ -489,7 +513,7 @@ public class App {
         }
         if (checkDirectory("cnct")) {
             if (directoryName != "") {
-                throw new IllegalArgumentException("More than 1 old and new directory combination found"); 
+                throw new IllegalArgumentException("More than 1 old and new directory combination found");
             }
             directoryName = "cnct"; 
         }
@@ -577,7 +601,7 @@ public class App {
         try {
             rootElement = document.getDocumentElement();
         } catch (Exception e) {
-            System.out.println("Exception thrown while getting root element from document\n" + e);
+            System.out.println("Exception thrown while getting root1 element from document\n" + e);
         }
             return trimEmptyElements(rootElement);
     }
@@ -654,5 +678,38 @@ public class App {
         File firstDirectory = new File("C:/" + directory);
         File secondDirectory = new File("C:/old " + directory);
         return firstDirectory.exists() && secondDirectory.exists();
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        String css = this.getClass().getResource("app.css").toExternalForm();
+        Image icon = new Image(App.class.getResourceAsStream("LK_logo_square.png"));
+        Parent root1 = FXMLLoader.load(getClass().getResource("scene1.fxml"));
+        // Parent root2 = FXMLLoader.load(getClass().getResource("scene2.fxml"));
+        // Parent root3 = FXMLLoader.load(getClass().getResource("scene3.fxml"));
+        // Parent root4 = FXMLLoader.load(getClass().getResource("scene4.fxml"));
+        // Parent root5 = FXMLLoader.load(getClass().getResource("scene5.fxml"));
+        Scene scene1 = new Scene(root1);
+        // Scene scene2 = new Scene(root2);
+        // Scene scene3 = new Scene(root3);
+        // Scene scene4 = new Scene(root4);
+        // Scene scene5 = new Scene(root5);
+        scene1.getStylesheets().add(css);
+        // scene2.getStylesheets().add(css);
+        // scene3.getStylesheets().add(css);
+        // scene4.getStylesheets().add(css);
+        // scene5.getStylesheets().add(css);
+        
+
+        
+        stage.setTitle("CNC12 Update Wizard");
+        stage.getIcons().add(icon);
+        stage.setResizable(false);
+        stage.setX(50);
+        stage.setY(50);
+        stage.setFullScreen(false);
+
+        stage.setScene(scene1);
+        stage.show();
     }
 }

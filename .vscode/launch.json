@@ -16,8 +16,8 @@
             "name": "App",
             "request": "launch",
             "mainClass": "com.frogman650.App",
-            "vmArgs": "--module-path C:\\Users\\Lucas\\Downloads\\openjfx-17.0.16_windows-x64_bin-sdk\\javafx-sdk-17.0.16\\lib --add-modules javafx.controls,javafx.fxml",
-            "projectName": "cnc12directoryrenamer"
+            "vmArgs": "--module-path C:\\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\\lib --add-modules javafx.controls,javafx.fxml",
+            "projectName": "cnc12wizardupgrade"
         }
     ]
 }
