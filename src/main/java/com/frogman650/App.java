@@ -39,6 +39,7 @@ public class App extends Application {
     public static Map<String, String> inputsMap = new LinkedHashMap<>();
     public static Map<String, String> outputsMap = new LinkedHashMap<>();
     public static Map<String, String> usbInputsMap = new LinkedHashMap<>();
+    public static String exceptionText = "";
     public static String board;
     public static String directoryName = "";
     public static String directoryFiles;
@@ -176,6 +177,7 @@ public class App extends Application {
                 previousIORootElement.appendChild(outputNode);
                 writeToXml("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml", previousIODocument);
             } catch (Exception e) {
+                exceptionText = "Exception thrown while creating IO preset";
                 System.out.println("Exception thrown while creating IO preset\n" + e);
             }
             System.out.println("IO preset *DONE*");
@@ -215,6 +217,7 @@ public class App extends Application {
             }
             scanner.close();
         } catch (Exception e) {
+            exceptionText = "Exception thrown while getting IO";
             System.out.println("Exception thrown while getting IO\n" + e);
             }
             System.out.println("Getting IO *DONE*");
@@ -230,6 +233,7 @@ public class App extends Application {
                 Paths.get(directoryName.equals("cnct") ? "C:/" + directoryFiles + "/cnctch.mac" : "C:/" + directoryFiles + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying tool change macro";
             System.out.println("Exception thrown while copying tool change macro\n" + e);
         }
         System.out.println("Tool change macro *DONE*");
@@ -245,6 +249,7 @@ public class App extends Application {
                 Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying home file";
             System.out.println("Exception thrown while copying home file\n" + e);
         }
         System.out.println("Home file *DONE*");
@@ -267,19 +272,25 @@ public class App extends Application {
             }
             writeToXml("C:/" + directoryName + "/" + directoryFiles + ".prm.xml", newParmDocument);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while transfering parameters";
             System.out.println("Exception thrown while transfering parameters");
         }
         System.out.println("Parameters *DONE*");
     }
 
     public static void defineParams() {
-        NodeList oldVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
-        NodeList newVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
-        for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
-            oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
-        }
-        for (int i = 0; i < newVersionNodeList.getLength(); i++) {
-            newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
+        try {
+            NodeList oldVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
+            NodeList newVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
+            for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
+                oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
+            }
+            for (int i = 0; i < newVersionNodeList.getLength(); i++) {
+                newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
+            }
+        } catch (Exception e) {
+            exceptionText = "Exception thrown while defining parameters";
+            System.out.println("Exception thrown while defining parameters");
         }
         System.out.println("Defining params *DONE*");
     }
@@ -307,6 +318,7 @@ public class App extends Application {
             }
             writeToXml("C:/" + directoryName + "/" + directoryFiles + "cfg.xml", newCfgDocument);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while transfering config file";
             System.out.println("Exception thrown while transfering config file\n" + e);
         }
         System.out.println("Config *DONE*");
@@ -328,6 +340,7 @@ public class App extends Application {
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while transfering wizard settings";
             System.out.println("Exception thrown while transfering wizard settings\n" + e);
         }
         System.out.println("Wizard settings *DONE*");
@@ -350,6 +363,7 @@ public class App extends Application {
             }
             writeToXml("C:/" + directoryName + "/resources/vcp/options.xml", newOptionsDocument);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while transfering VCP options";
             System.out.println("Exception thrown while transfering VCP options\n" + e);
         }
         System.out.println("VCP options *DONE*");
@@ -363,6 +377,7 @@ public class App extends Application {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".tl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".tl"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying tool library";
             System.out.println("Exception thrown while copying tool library\n" + e);
         }
         System.out.println("Tool library *DONE*");
@@ -372,6 +387,7 @@ public class App extends Application {
         try {
             Files.copy(Paths.get("C:/old "+ directoryName +"/mt.stats"), Paths.get("C:/"+ directoryName +"/mt.stats"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying stats file";
             System.out.println("Exception thrown while copying stats file\n" + e);
         }
         System.out.println("Stats *DONE*");
@@ -381,6 +397,7 @@ public class App extends Application {
         try {
             Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".wcs"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".wcs"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying WCS file";
             System.out.println("Exception thrown while copying WCS file\n" + e);
         }
         System.out.println("WCS *DONE*");
@@ -413,6 +430,7 @@ public class App extends Application {
                 }
                 writeToXml("C:/" + directoryName + "/RackMountBin.xml", newRackMountDocument);
             } catch (Exception e) {
+                exceptionText = "Exception thrown while transfering rack mount settings";
                 System.out.println("Exception thrown while transfering rack mount settings\n" + e);
             }
         }
@@ -445,6 +463,7 @@ public class App extends Application {
                 }
                 writeToXml("C:/" + directoryName + "/PlasmaConfigurations.xml", newPlasmaConfigDocument);
             } catch (Exception e) {
+                exceptionText = "Exception thrown while transfering plasma config";
                 System.out.println("Exception thrown while transfering plasma config\n" + e);
             }
             System.out.println("Plasma config *DONE*");
@@ -466,6 +485,7 @@ public class App extends Application {
                 }
                 writeToXml("C:/" + directoryName + "/FixedCarouselSettings.xml", newCarouselSettingsDocument);
             } catch (Exception e) {
+                exceptionText = "Exception thrown while transfering carousel settings";
                 System.out.println("Exception thrown while transfering carousel settings\n" + e);
             }
         }
@@ -477,6 +497,7 @@ public class App extends Application {
             try {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ol"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ol"), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
+                exceptionText = "Exception thrown while copying offset library";
                 System.out.println("Exception thrown while copying offset library\n" + e);
             }
         }
@@ -490,21 +511,27 @@ public class App extends Application {
             Files.copy(Paths.get("C:/old "+ directoryName +"/license.dat"), Paths.get("C:/"+ directoryName +"/license.dat"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
+            exceptionText = "Exception thrown while copying license";
             System.out.println("Exception thrown while copying license\n" + e);
         }
         System.out.println("License *DONE*");
     }
 
     public static void setBoardSoftwareInfo() {
-        oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
-        newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
-        oldversionCombined = getVersionCombined(oldversionRaw);
-        newversionCombined = getVersionCombined(newversionRaw);
-        if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
-            newversionCombined = 540;
+        try {
+            oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
+            newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
+            oldversionCombined = getVersionCombined(oldversionRaw);
+            newversionCombined = getVersionCombined(newversionRaw);
+            if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
+                newversionCombined = 540;
+            }
+            boardKeyA = getKeyA("C:/" + directoryName + "/" + directoryFiles + "cfg.xml");
+            board = getBoardType();
+        } catch (Exception e) {
+            exceptionText = "Exception thrown while setting board and software version";
+            System.out.println("Exception thrown while setting board and software version\n" + e);
         }
-        boardKeyA = getKeyA("C:/" + directoryName + "/" + directoryFiles + "cfg.xml");
-        board = getBoardType();
     }
 
     public static void setDirectoryName() {
@@ -548,6 +575,7 @@ public class App extends Application {
             keyA = getRootElement(getDocument(filePath)).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
         } catch (Exception e) {
+            exceptionText = "Exception thrown while getting KeyA";
             System.out.println("Exception thrown while getting KeyA\n" + e);
         }
         return keyASplit[keyASplit.length-1];
@@ -591,6 +619,7 @@ public class App extends Application {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new File(filePath));
         } catch (Exception e) {
+            exceptionText = "Exception thrown while getting document from: " + filePath;
             System.out.println("Exception thrown while getting document from: " + filePath + "\n" + e);
         }
         return document;
@@ -601,6 +630,7 @@ public class App extends Application {
         try {
             rootElement = document.getDocumentElement();
         } catch (Exception e) {
+            exceptionText = "Exception thrown while getting root1 element from document";
             System.out.println("Exception thrown while getting root1 element from document\n" + e);
         }
             return trimEmptyElements(rootElement);
@@ -614,6 +644,7 @@ public class App extends Application {
             StreamResult docResult = new StreamResult(new File(filePath));
             transformer.transform(docSource, docResult);
         } catch (Exception e) {
+            exceptionText = "Exception thrown while writing to file: " + filePath;
             System.out.println("Exception thrown while writing to file: " + filePath + "\n" + e);
         }
     }
@@ -627,6 +658,7 @@ public class App extends Application {
             softwareVersion = softwareVersionNodeList.item(0).getTextContent();
             softwareVersionSplit = softwareVersion.split(" ");
         } catch (Exception e) {
+            exceptionText = "Exception thrown while setting raw version";
             System.out.println("Exception thrown while setting raw version\n" + e);
         }
         if (softwareVersionSplit[0].equals("ACORN")) {
@@ -641,6 +673,7 @@ public class App extends Application {
         try {
             versionSplitSplit = rawVersion.split("\\.");
         } catch (Exception e) {
+            exceptionText = "Exception thrown while getting combined version";
             System.out.println("Exception thrown while getting combined version\n" + e);
         }
         if (versionSplitSplit.length == 2) {
@@ -665,6 +698,7 @@ public class App extends Application {
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             newBoard = boardVersion.split("_")[2];
         } catch (Exception e) {
+            exceptionText = "Exception thrown while setting board type";
             System.out.println("Exception thrown while setting board type\n" + e);
         }
         if (oldBoard.equals(newBoard)) {
@@ -682,25 +716,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        String css = this.getClass().getResource("app.css").toExternalForm();
         Image icon = new Image(App.class.getResourceAsStream("LK_logo_square.png"));
         Parent root1 = FXMLLoader.load(getClass().getResource("scene1.fxml"));
-        // Parent root2 = FXMLLoader.load(getClass().getResource("scene2.fxml"));
-        // Parent root3 = FXMLLoader.load(getClass().getResource("scene3.fxml"));
-        // Parent root4 = FXMLLoader.load(getClass().getResource("scene4.fxml"));
-        // Parent root5 = FXMLLoader.load(getClass().getResource("scene5.fxml"));
         Scene scene1 = new Scene(root1);
-        // Scene scene2 = new Scene(root2);
-        // Scene scene3 = new Scene(root3);
-        // Scene scene4 = new Scene(root4);
-        // Scene scene5 = new Scene(root5);
-        scene1.getStylesheets().add(css);
-        // scene2.getStylesheets().add(css);
-        // scene3.getStylesheets().add(css);
-        // scene4.getStylesheets().add(css);
-        // scene5.getStylesheets().add(css);
-        
-
+        scene1.getStylesheets().add(this.getClass().getResource("app.css").toExternalForm());
         
         stage.setTitle("CNC12 Update Wizard");
         stage.getIcons().add(icon);

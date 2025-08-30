@@ -2,33 +2,21 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchor_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller2">
    <children>
-      <Button fx:id="cancel_button" cancelButton="true" layoutX="695.0" layoutY="547.0" mnemonicParsing="false" onAction="#button1" prefHeight="19.0" prefWidth="59.0" text="Cancel" />
-      <Button fx:id="next_button" layoutX="625.0" layoutY="547.0" mnemonicParsing="false" onAction="#button2" text="Next &gt;" />
-      <Button fx:id="do_it_button" defaultButton="true" layoutX="565.0" layoutY="547.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="53.0" text="Do it" />
-      <Line endX="386.5" layoutX="374.0" layoutY="101.0" startX="-342.5" />
-      <Label fx:id="primary_text" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Introduction">
-         <font>
-            <Font name="Arial" size="30.0" />
-         </font>
+      <Button fx:id="cancelButton" layoutX="695.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="19.0" prefWidth="59.0" text="Cancel" />
+      <Button fx:id="nextButton" cancelButton="true" layoutX="625.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" text="Next &gt;" />
+      <Button fx:id="backButton" layoutX="565.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="25.0" prefWidth="53.0" text="&lt; Back" />
+      <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
+      <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0">
       </Label>
-      <Label fx:id="secondary_text" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Welcome to the CNC12 Update wizard!">
-         <font>
-            <Font name="Arial" size="20.0" />
-         </font>
+      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0">
       </Label>
-      <Label fx:id="body_text" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="148.0" prefWidth="730.0" text="Using this tool you can easily update CNC12 and transfer your settings to the new version. Be mindful that this tool does not set anything new that is added. It is your responsibility as the updater to familiarize yourself with any changes made between the old version and new." wrapText="true">
-         <font>
-            <Font name="Arial" size="20.0" />
-         </font>
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" wrapText="true">
       </Label>
-      <Line endX="386.5" layoutX="378.0" layoutY="515.0" startX="-342.5" />
-      <ProgressBar fx:id="progress_bar" layoutX="76.0" layoutY="544.0" prefHeight="31.0" prefWidth="377.0" progress="0.0" />
+      <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
    </children>
 </AnchorPane>
