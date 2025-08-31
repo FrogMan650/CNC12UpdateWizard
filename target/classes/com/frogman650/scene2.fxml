@@ -4,19 +4,21 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller2">
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
    <children>
-      <Button fx:id="cancelButton" layoutX="695.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="19.0" prefWidth="59.0" text="Cancel" />
-      <Button fx:id="nextButton" cancelButton="true" layoutX="625.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" text="Next &gt;" />
-      <Button fx:id="backButton" layoutX="565.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="25.0" prefWidth="53.0" text="&lt; Back" />
+      <Button fx:id="nextButton" layoutX="600.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" prefHeight="27.0" prefWidth="70.0" text="Next &gt;"/>
+      <Button fx:id="cancelButton" cancelButton="true" layoutX="690.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="27.0" prefWidth="70.0" text="Cancel"/>
+      <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back"/>
       <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
-      <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0">
+      <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Getting started">
       </Label>
-      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0">
+      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Renaming directories and new install">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" wrapText="true">
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="1. We need to rename the current cnc* directory in the C: drive based on the type of machine it is:&#10;Mill = 'old cncm'&#10;Lathe = 'old cnct'&#10;Router = 'old cncr'&#10;Plasma = 'old cncp'&#10;Laser = 'old cncl'&#10;&#10;Even if your directory previously was 'cncm', it needs to be renamed to 'old cncr' if it's a router.&#10;&#10;2. Download the latest CNC12 installer from the Centroid website and install the latest version of CNC12. Without opening CNC12, move on to the next screen." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
+      <Label fx:id="errorText" layoutX="33.0" layoutY="547.0" prefHeight="25.0" prefWidth="496.0" textFill="#cd0000" />
    </children>
 </AnchorPane>

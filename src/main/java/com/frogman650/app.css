@@ -1,18 +1,28 @@
+.root {
+    -fx-font-family: Arial, Helvetica, sans-serif;
+}
+
 #anchorPane {
-    -fx-background-color:"#f7e6cd";
+    -fx-background-color:"#dedee0";
 }
 
 #primaryText {
     -fx-font-size: 30px;
-    -fx-font-family: Arial, Helvetica, sans-serif;
 }
 
 #secondaryText, #bodyText {
     -fx-font-size: 20px;
-    -fx-font-family: Arial, Helvetica, sans-serif;
 }
 
 #errorText {
     -fx-font-size: 15px;
-    -fx-font-family: Arial, Helvetica, sans-serif;
+}
+
+#scrollPane > .viewport {
+    -fx-font-size: 20px;
+    -fx-background-color:"#dedee0";
+}
+
+#nextButton, #cancelButton, #backButton, #finishButton {
+    -fx-font-size: 15px;
 }
