@@ -4,9 +4,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.control.ProgressBar?>
 
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
    <children>
+      <ProgressBar fx:id="progressBar" opacity="0.25" prefHeight="102.0" prefWidth="800.0" progress="0.8" />
       <Button fx:id="nextButton" layoutX="600.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" prefHeight="27.0" prefWidth="70.0" text="Next &gt;" />
       <Button fx:id="cancelButton" cancelButton="true" layoutX="690.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="27.0" prefWidth="70.0" text="Cancel" />
       <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back" />
@@ -18,6 +20,6 @@
       <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="Now that all of your I/O is loaded, we can now save our changes.&#10;&#10;1.  Click the &quot;Write Settings to CNC Control Configuration&quot; button found in the bottom right of the wizard screen.&#10;2. Click &quot;Yes&quot; to confirm you'd like to write the settings.&#10;3. Click &quot;OK&quot; to acknowledge the warning about PLC changes.&#10;4. Power cycle the board.&#10;5. Click &quot;Cancel&quot; instead of &quot;OK,&quot; as to not restart CNC12.&#10;6. If CNC12 is open, close it at this time.&#10;&#10;With CNC12 closed, move on to the next screen." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <Label fx:id="errorText" layoutX="33.0" layoutY="547.0" prefHeight="25.0" prefWidth="496.0" textFill="#cd0000" />
+      <Label fx:id="errorText" layoutX="33.0" layoutY="536.0" prefHeight="50.0" prefWidth="481.0" textFill="#cd0000" wrapText="true" />
    </children>
 </AnchorPane>

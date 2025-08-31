@@ -16,7 +16,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -48,6 +47,43 @@ public class App extends Application {
     public static Boolean usbBobInstalled = false;
     public static void main(String[] args) throws Exception {
         launch(args);
+    }
+
+    public static void checkBoardAndVersion() {
+        if (board.equals("hickory") && oldversionCombined < 520) {
+            exceptionText = exceptionText.equals("") ? "Hickory updater only available for CNC12 v5.20 and newer" : exceptionText;
+        }
+        if (board.equals("acorn") && oldversionCombined < 500) {
+            exceptionText = exceptionText.equals("") ? "Acorn updater only available for CNC12 v5.00 and newer" : exceptionText;
+        }
+        if (board.equals("acornsix") && oldversionCombined < 500) {
+            exceptionText = exceptionText.equals("") ? "AcornSix updater only available for CNC12 v5.00 and newer" : exceptionText;
+        }
+    }
+
+    public static void transferBobConfig() {
+      try {
+            Document newCfgDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml");
+            NodeList oldCfgNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".bobcfg.xml")).getChildNodes();
+            NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
+            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+                NodeList oldCfgInputList = oldCfgNodeList.item(i).getChildNodes();
+                NodeList newCfgInputList = newCfgNodeList.item(i).getChildNodes();
+                for (int j = 0; j < oldCfgInputList.getLength(); j++) {
+                    for (int k = 0; k < newCfgInputList.getLength(); k++) {
+                        if (oldCfgInputList.item(j).getAttributes().getNamedItem("index").getNodeValue().equals(newCfgInputList.item(k).getAttributes().getNamedItem("index").getNodeValue())) {
+                            newCfgInputList.item(k).setTextContent(oldCfgInputList.item(j).getTextContent());
+                        }
+                    }
+                }
+            }
+            writeToXml("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml", newCfgDocument);
+            System.out.println("Bobconfig *DONE*");
+        } catch (Exception e) {
+            exceptionText = exceptionText.equals("") ? "Error transfering config" : exceptionText;
+            exceptionText = "Error transfering bobconfig file";
+            System.out.println("Exception thrown while transfering bobconfig file\n" + e);
+        }
     }
 
     public static void createPresetIO() {
@@ -256,8 +292,6 @@ public class App extends Application {
             Document newCfgDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml");
             NodeList oldCfgNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getChildNodes();
             NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
-            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
-            }
             for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
                 Element element = (Element) oldCfgNodeList.item(i);
                 Element element2 = (Element) newCfgNodeList.item(i);
@@ -474,19 +508,28 @@ public class App extends Application {
         }
     }
 
-    public static void setBoardSoftwareInfo() {
+    public static void setOldBoardSoftwareInfo() {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
-            newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             oldversionCombined = getVersionCombined(oldversionRaw);
+            System.out.println("Old software info *DONE*");
+        } catch (Exception e) {
+            exceptionText = exceptionText.equals("") ? "Error setting old software version" : exceptionText;
+            System.out.println("Exception thrown while setting old software version\n" + e);
+        }
+    }
+
+    public static void setNewBoardSoftwareInfo() {
+        try {
+            newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             newversionCombined = getVersionCombined(newversionRaw);
             if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
                 newversionCombined = 540;
             }
-            System.out.println("Software info *DONE*");
+            System.out.println("New software info *DONE*");
         } catch (Exception e) {
-            exceptionText = exceptionText.equals("") ? "Error setting software versions" : exceptionText;
-            System.out.println("Exception thrown while setting board and software version\n" + e);
+            exceptionText = exceptionText.equals("") ? "Error setting new software version" : exceptionText;
+            System.out.println("Exception thrown while setting new software version\n" + e);
         }
     }
 
@@ -525,17 +568,39 @@ public class App extends Application {
         System.out.println("Directory name *DONE*");
     }
 
-    public static void getKeyA() {
+    public static void getOldKeyA() {
+        String keyA;
+        String[] keyASplit = null;
+        try {
+            keyA = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
+            keyASplit = keyA.split(" ");
+            boardKeyA = keyASplit[keyASplit.length-1];
+            System.out.println("Old KeyA *DONE*");
+        } catch (Exception e) {
+            exceptionText = exceptionText.equals("") ? "Error getting old KeyA" : exceptionText;
+            System.out.println("Exception thrown while getting old KeyA\n" + e);
+        }
+    }
+
+    public static String getNewKeyA() {
         String keyA;
         String[] keyASplit = null;
         try {
             keyA = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
-            boardKeyA = keyASplit[keyASplit.length-1];
-            System.out.println("KeyA *DONE*");
+            System.out.println("New KeyA *DONE*");
         } catch (Exception e) {
-            exceptionText = exceptionText.equals("") ? "Error getting KeyA" : exceptionText;
-            System.out.println("Exception thrown while getting KeyA\n" + e);
+            exceptionText = exceptionText.equals("") ? "Error getting new KeyA" : exceptionText;
+            System.out.println("Exception thrown while getting new KeyA\n" + e);
+        }
+        return keyASplit[keyASplit.length-1];
+    }
+
+    public static void checkKeyA() {
+        getOldKeyA();
+        String newKeyA = getNewKeyA();
+        if (!boardKeyA.equals(newKeyA)) {
+            exceptionText = "KeyA mismatch: " + boardKeyA + " and " + newKeyA;
         }
     }
 
@@ -646,29 +711,45 @@ public class App extends Application {
         }
     }
 
-    public static void getBoardType() {
+    public static void getOldBoard() {
         NodeList boardVersionNodeList;
         String boardVersion;
         String oldBoard = null;
-        String newBoard = null;
         String oldFilePath = "C:/old " + directoryName + "/mpu_info.xml";
-        String newFilePath ="C:/" + directoryName + "/mpu_info.xml";
         try {
             boardVersionNodeList = getRootElement(getDocument(oldFilePath)).getElementsByTagName("PLCDeviceID");
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             oldBoard = boardVersion.split("_")[2];
+            board = oldBoard;
+            System.out.println("Old board type *DONE*");
+        } catch (Exception e) {
+            exceptionText = exceptionText.equals("") ? "Error getting old board type" : exceptionText;
+            System.out.println("Exception thrown while getting old board type\n" + e);
+        }
+    }
+
+    public static String getNewBoard() {
+        NodeList boardVersionNodeList;
+        String boardVersion;
+        String newBoard = null;
+        String newFilePath ="C:/" + directoryName + "/mpu_info.xml";
+        try {
             boardVersionNodeList = getRootElement(getDocument(newFilePath)).getElementsByTagName("PLCDeviceID");
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             newBoard = boardVersion.split("_")[2];
+            System.out.println("New board type *DONE*");
         } catch (Exception e) {
-            exceptionText = exceptionText.equals("") ? "Error setting board type" : exceptionText;
-            System.out.println("Exception thrown while setting board type\n" + e);
+            exceptionText = exceptionText.equals("") ? "Error getting new board type" : exceptionText;
+            System.out.println("Exception thrown while getting new board type\n" + e);
         }
-        if (oldBoard.equals(newBoard)) {
-            board = newBoard;
-            System.out.println("Board type *DONE*");
-        } else {
-            exceptionText = "Board mismatch: " + oldBoard + " and " + newBoard;
+        return newBoard;
+    }
+
+    public static void checkBoards() {
+        getOldBoard();
+        String newBoard = getNewBoard();
+        if (!board.equals(newBoard)) {
+            exceptionText = "Board mismatch: " + board + " and " + newBoard;
         }
     }
 

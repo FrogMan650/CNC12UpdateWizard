@@ -37,16 +37,18 @@ public class Controller implements Initializable {
         }
         if (counter == 3) {
             App.setDirectoryName();
+            App.getOldBoard();
+            App.setOldBoardSoftwareInfo();
+            App.checkBoardAndVersion();
+            App.getOldKeyA();
             App.copyLicense();
             App.createPresetIO();
         }
         if (counter == 4) {
-
         }
         if (counter == 5) {
-            App.getBoardType();
-            App.getKeyA();
-            App.setBoardSoftwareInfo();
+            App.checkBoards();
+            App.setNewBoardSoftwareInfo();
         }
         if (counter == 6) {
             App.copyOffsetLibrary();
@@ -60,6 +62,7 @@ public class Controller implements Initializable {
             App.transferPlasmaConfig();
             App.transferOptions();
             App.transferConfig();
+            App.transferBobConfig();
             App.transferWizardSettings();
             App.transferParms();
         }
