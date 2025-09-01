@@ -1,0 +1,19 @@
+Process
+=======
+link
+
+Command Line
+============
+link C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\gvm\cnc12wizardupgrade\launcher.obj C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\gvm\tmp\SVM-1756754672300\com.frogman650.app.obj C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\gvm\cnc12wizardupgrade\IconGroup.obj j2pkcs11.lib java.lib net.lib nio.lib prefs.lib fdlibm.lib zip.lib sunmscapi.lib jvm.lib libchelper.lib advapi32.lib iphlpapi.lib secur32.lib userenv.lib version.lib ws2_32.lib winhttp.lib ncrypt.lib crypt32.lib /NODEFAULTLIB:libcmt.lib /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup comdlg32.lib dwmapi.lib gdi32.lib imm32.lib shell32.lib uiautomationcore.lib urlmon.lib winmm.lib glass.lib javafx_font.lib javafx_iio.lib prism_common.lib prism_d3d.lib /WHOLEARCHIVE:glass.lib /WHOLEARCHIVE:javafx_font.lib /WHOLEARCHIVE:javafx_iio.lib /WHOLEARCHIVE:prism_common.lib /WHOLEARCHIVE:prism_d3d.lib /OUT:C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\cnc12wizardupgrade.exe /LIBPATH:C:\Users\Lucas\.gluon\substrate\javafxStaticSdk\21-ea+11.2\windows-x86_64\sdk\lib /LIBPATH:C:\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\lib\svm\clibraries\windows-amd64 /LIBPATH:C:\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\graalvm-svm-java17-windows-gluon-22.1.0.1-Final\lib\static\windows-amd64
+
+Output
+======
+Microsoft (R) Incremental Linker Version 14.44.35215.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+   Creating library C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\cnc12wizardupgrade.lib and object C:\Github projects\CNC12WizardUpgrade\target\gluonfx\x86_64-windows\cnc12wizardupgrade.exp
+
+
+Result
+======
+result: 0

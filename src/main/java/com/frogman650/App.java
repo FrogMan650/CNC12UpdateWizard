@@ -92,10 +92,19 @@ public class App extends Application {
     public static void createPresetIO() {
         getIO();
         try {
-            Files.copy(Paths.get("src/main/resources/com/frogman650/Previous_IO.xml"), Paths.get("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(Paths.get("C:/"+ directoryName +"/resources/wizard/default/plcPresets/Bench Test.xml"), Paths.get("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml"), StandardCopyOption.REPLACE_EXISTING);
             Document previousIODocument = getDocument("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml");
             NodeList functionsNodeList = getDocument("C:/"+ directoryName +"/resources/wizard/default/plc/functions.xml").getElementsByTagName("PlcFunction");
             Element previousIORootElement = getRootElement(previousIODocument);
+            for (int i = previousIORootElement.getChildNodes().getLength()-1; i >= 0; i--) {
+                previousIORootElement.removeChild(previousIORootElement.getChildNodes().item(i));
+            }
+            Element nodeName = previousIODocument.createElement("Name");
+            nodeName.setTextContent("Previous_IO");
+            previousIORootElement.appendChild(nodeName);
+            Element nodeIsCustom = previousIODocument.createElement("IsCustom");
+            nodeIsCustom.setTextContent("true");
+            previousIORootElement.appendChild(nodeIsCustom);
             Element inputNode = previousIODocument.createElement("Inputs");
             Element outputNode = previousIODocument.createElement("Outputs");
             for (int i = 0; i < functionsNodeList.getLength(); i++) {
@@ -109,8 +118,6 @@ public class App extends Application {
                     IONumberNode.setTextContent(inputsMap.get(name).split("P")[1]);
                     Element isSelectedNode = previousIODocument.createElement("IsSelected");
                     isSelectedNode.setTextContent("true");
-                    // Element stateNode = previousIODocument.createElement("State");
-                    // stateNode.setTextContent("NormallyClosed");
                     Node importedNode = previousIODocument.importNode(importNode, true);
                     definitionNode.appendChild(importedNode);
                     Element newElement = previousIODocument.createElement("Function");
@@ -127,11 +134,9 @@ public class App extends Application {
                             newElement.appendChild(previousIODocument.importNode(child, true));
                         }
                             oldElement.getParentNode().replaceChild(newElement, oldElement);
-                            // definitionNode.appendChild(newElement);
                     }
                     definitionNode.appendChild(isSelectedNode);
                     definitionNode.appendChild(IONumberNode);
-                    // definitionNode.appendChild(stateNode);
                     inputNode.appendChild(definitionNode);
                 }
                 if (outputsMap.containsKey(name)) {
@@ -140,8 +145,6 @@ public class App extends Application {
                     IONumberNode.setTextContent(outputsMap.get(name).split("T")[1]);
                     Element isSelectedNode = previousIODocument.createElement("IsSelected");
                     isSelectedNode.setTextContent("true");
-                    // Element stateNode = previousIODocument.createElement("State");
-                    // stateNode.setTextContent("NormallyClosed");
                     Node importedNode = previousIODocument.importNode(importNode, true);
                     definitionNode.appendChild(importedNode);
                     Element newElement = previousIODocument.createElement("Function");
@@ -158,11 +161,9 @@ public class App extends Application {
                             newElement.appendChild(previousIODocument.importNode(child, true));
                         }
                             oldElement.getParentNode().replaceChild(newElement, oldElement);
-                            // definitionNode.appendChild(newElement);
                     }
                     definitionNode.appendChild(isSelectedNode);
                     definitionNode.appendChild(IONumberNode);
-                    // definitionNode.appendChild(stateNode);
                     outputNode.appendChild(definitionNode);
                 }
             }
@@ -296,8 +297,12 @@ public class App extends Application {
 
     public static void defineParams() {
         try {
-            NodeList oldVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml")).getElementsByTagName("Parameter");
-            NodeList newVersionNodeList = getRootElement(getDocument("src/main/resources/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml")).getElementsByTagName("Parameter");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
+            Document document2 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml"));
+            NodeList oldVersionNodeList = getRootElement(document1).getElementsByTagName("Parameter");
+            NodeList newVersionNodeList = getRootElement(document2).getElementsByTagName("Parameter");
             for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
                 oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
             }
@@ -418,7 +423,7 @@ public class App extends Application {
         if (file.exists()) {
             try {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/scale_settings.xml"), Paths.get("C:/"+ directoryName +"/scale_settings.xml"), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Stats *DONE*");
+                System.out.println("Scales settings *DONE*");
             } catch (Exception e) {
                 exceptionText = exceptionText.equals("") ? "Error copying scales settings" : exceptionText;
                 System.out.println("Exception thrown while copying scales settings\n" + e);
