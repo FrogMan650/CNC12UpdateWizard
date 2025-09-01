@@ -179,32 +179,22 @@
   "bundles":[
     {
       "name":"com.sun.javafx.tk.quantum.QuantumMessagesBundle",
-      "locales":[
-        "", 
-        "und"
-      ]
+      "locales":["und"]
     }, 
     {
       "name":"com.sun.org.apache.xml.internal.serializer.XMLEntities",
-      "locales":[
-        "", 
-        "und"
-      ]
+      "locales":["und"]
     }, 
     {
       "name":"com/sun/glass/ui/win/themes",
       "locales":[
-        "", 
         "en", 
         "und"
       ]
     }, 
     {
       "name":"com/sun/javafx/scene/control/skin/resources/controls",
-      "locales":[
-        "", 
-        "und"
-      ]
+      "locales":["und"]
     }
   ]
 }

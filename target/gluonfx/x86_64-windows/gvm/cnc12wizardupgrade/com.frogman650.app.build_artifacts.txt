@@ -1,6 +1,0 @@
-[HEADER]
-com.frogman650.app.h
-graal_isolate.h
-com.frogman650.app_dynamic.h
-graal_isolate_dynamic.h
-
