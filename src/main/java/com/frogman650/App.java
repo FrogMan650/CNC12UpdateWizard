@@ -62,27 +62,30 @@ public class App extends Application {
     }
 
     public static void transferBobConfig() {
-      try {
-            Document newCfgDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml");
-            NodeList oldCfgNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".bobcfg.xml")).getChildNodes();
-            NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
-            for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
-                NodeList oldCfgInputList = oldCfgNodeList.item(i).getChildNodes();
-                NodeList newCfgInputList = newCfgNodeList.item(i).getChildNodes();
-                for (int j = 0; j < oldCfgInputList.getLength(); j++) {
-                    for (int k = 0; k < newCfgInputList.getLength(); k++) {
-                        if (oldCfgInputList.item(j).getAttributes().getNamedItem("index").getNodeValue().equals(newCfgInputList.item(k).getAttributes().getNamedItem("index").getNodeValue())) {
-                            newCfgInputList.item(k).setTextContent(oldCfgInputList.item(j).getTextContent());
+        File file = new File("C:/old " + directoryName + "/" + directoryFiles + ".bobcfg.xml");
+        if (file.exists()) {
+            try {
+                Document newCfgDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml");
+                NodeList oldCfgNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".bobcfg.xml")).getChildNodes();
+                NodeList newCfgNodeList = getRootElement(newCfgDocument).getChildNodes();
+                for (int i = 0; i < oldCfgNodeList.getLength(); i++) {
+                    NodeList oldCfgInputList = oldCfgNodeList.item(i).getChildNodes();
+                    NodeList newCfgInputList = newCfgNodeList.item(i).getChildNodes();
+                    for (int j = 0; j < oldCfgInputList.getLength(); j++) {
+                        for (int k = 0; k < newCfgInputList.getLength(); k++) {
+                            if (oldCfgInputList.item(j).getAttributes().getNamedItem("index").getNodeValue().equals(newCfgInputList.item(k).getAttributes().getNamedItem("index").getNodeValue())) {
+                                newCfgInputList.item(k).setTextContent(oldCfgInputList.item(j).getTextContent());
+                            }
                         }
                     }
                 }
+                writeToXml("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml", newCfgDocument);
+                System.out.println("Bobconfig *DONE*");
+            } catch (Exception e) {
+                exceptionText = exceptionText.equals("") ? "Error transfering config" : exceptionText;
+                exceptionText = "Error transfering bobconfig file";
+                System.out.println("Exception thrown while transfering bobconfig file\n" + e);
             }
-            writeToXml("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml", newCfgDocument);
-            System.out.println("Bobconfig *DONE*");
-        } catch (Exception e) {
-            exceptionText = exceptionText.equals("") ? "Error transfering config" : exceptionText;
-            exceptionText = "Error transfering bobconfig file";
-            System.out.println("Exception thrown while transfering bobconfig file\n" + e);
         }
     }
 
@@ -252,11 +255,32 @@ public class App extends Application {
             Document newParmDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
             NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
+            Double fourthPairing = 0.0;
+            Double fifthPairing = 0.0;
             for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
                 Node oldParmNode = oldParmNodeList.item(i);
                 Node newParmNode = newParmNodeList.item(i);
                 Element element = (Element) oldParmNode;
                 String text = element.getTextContent();
+                if (i == 64 && !(Double.parseDouble(text) == 0) && oldversionCombined < 540) {
+                    //handle transfering P64 from older versions to P554/555 in newer versions
+                    Double parmValueDouble = Double.parseDouble(text);
+                    Double[] oldPairingParam = {64.0, 48.0, 32.0, 16.0, 3.0, 2.0, 1.0};
+                    for (int j = 0; j < oldPairingParam.length; j++) {
+                        if (parmValueDouble >= oldPairingParam[j]) {
+                            if (parmValueDouble >= 16) {
+                                fifthPairing = oldPairingParam[j] / 16;
+                            } else {
+                                fourthPairing = oldPairingParam[j];
+                            }
+                            parmValueDouble -= oldPairingParam[j];
+                        }
+                    }
+                } else if (i == 554) {
+                    newParmNode.setTextContent(fourthPairing.toString());
+                } else if (i == 555) {
+                    newParmNode.setTextContent(fifthPairing.toString());
+                }
                 if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
                     newParmNode.setTextContent(text);
                     //newParmNode.setTextContent("69");//for testing
@@ -300,7 +324,12 @@ public class App extends Application {
                 for (int j = 0; j < attributes.getLength(); j++) {
                     for (int k = 0; k < attributes2.getLength(); k++) {
                         if (attributes.item(j).getNodeName().equals(attributes2.item(k).getNodeName())) {
-                        element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
+                            if (attributes.item(j).getNodeName().equals("v300_ConsoleType") && attributes.item(j).getNodeValue().equals("1")) {
+                                //if console type set to "Legacy" previously, set it to M400/M39 VCP
+                                element2.setAttribute(attributes2.item(k).getNodeName(), "4");
+                            } else {
+                                element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
+                            }
                         break;
                         }
                     }
@@ -381,6 +410,19 @@ public class App extends Application {
         } catch (Exception e) {
             exceptionText = exceptionText.equals("") ? "Error copying stats file" : exceptionText;
             System.out.println("Exception thrown while copying stats file\n" + e);
+        }
+    }
+
+    public static void copyScales() {
+        File file = new File("C:/old "+ directoryName +"/scale_settings.xml");
+        if (file.exists()) {
+            try {
+                Files.copy(Paths.get("C:/old "+ directoryName +"/scale_settings.xml"), Paths.get("C:/"+ directoryName +"/scale_settings.xml"), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Stats *DONE*");
+            } catch (Exception e) {
+                exceptionText = exceptionText.equals("") ? "Error copying scales settings" : exceptionText;
+                System.out.println("Exception thrown while copying scales settings\n" + e);
+            }
         }
     }
 

@@ -57,6 +57,7 @@ public class Controller implements Initializable {
             App.copyHomeFile();
             App.copyToolLibrary();
             App.copyToolChangeFile();
+            App.copyScales();
             App.transferCarouselSettings();
             App.transferRackMount();
             App.transferPlasmaConfig();
