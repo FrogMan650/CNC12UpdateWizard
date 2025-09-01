@@ -1,7 +1,4 @@
 # CNC12WizardUpgrade
- App to update xml files when "updating" CNC12 on a control that has a wizard
-
-To compile into an exe:
-1. Open a command prompt
-3. Change to the bin directory
-2. Execute command: native-image App
+ App to "update" CNC12 to v5.4 from an older version for controls with a wizard.
+ Only works for Acorn, AcornSix, and Hickory (with wizard).
+ Currently only supports CNC12 v5.0 and newer for Acorn and AcornSix and CNC12 v5.20 and newer for Hickory (with wizard).
