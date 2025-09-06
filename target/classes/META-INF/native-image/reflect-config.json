@@ -12,6 +12,7 @@
   "queryAllDeclaredMethods":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"backButtonAction","parameterTypes":["javafx.event.ActionEvent"] }, 
     {"name":"cancelButtonAction","parameterTypes":["javafx.event.ActionEvent"] }, 
     {"name":"nextButtonAction","parameterTypes":["javafx.event.ActionEvent"] }
   ]
@@ -192,6 +193,15 @@
   "methods":[{"name":"setProgress","parameterTypes":["double"] }]
 },
 {
+  "name":"javafx.scene.control.ScrollPane",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.effect.Effect"
+},
+{
   "name":"javafx.scene.image.Image"
 },
 {
@@ -233,6 +243,9 @@
 },
 {
   "name":"javafx.scene.shape.Rectangle"
+},
+{
+  "name":"javafx.scene.shape.SVGPath"
 },
 {
   "name":"javafx.scene.shape.Shape",

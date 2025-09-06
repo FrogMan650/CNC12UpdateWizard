@@ -14,8 +14,9 @@
     -fx-font-size: 20px;
 }
 
-#errorText {
+#errorText > .viewport {
     -fx-font-size: 15px;
+    -fx-background-color:"#dedee0";
 }
 
 #scrollPane > .viewport {

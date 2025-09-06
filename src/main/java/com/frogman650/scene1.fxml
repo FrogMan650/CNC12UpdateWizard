@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
@@ -16,9 +17,9 @@
       </Label>
       <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Welcome to the CNC12 Update wizard!">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="378.0" prefWidth="730.0" text="Using this tool you can easily update CNC12 for Acorn, AcornSix, and Hickory (with wizard) and transfer your settings to the new version. Be mindful that this tool does not set anything new that is added. It is your responsibility as the updater to familiarize yourself with any changes made between the old version and new and adjust settings accordingly." wrapText="true">
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="378.0" prefWidth="730.0" text="Using this tool you can easily update CNC12 for Acorn, AcornSix, and Hickory (with wizard) and transfer your settings to the new version. Be mindful that this tool does not set anything new that is added. It is your responsibility as the updater to familiarize yourself with any changes made between the old version and new and adjust settings accordingly.&#10;&#10;Near the bottom of the screen Warnings will show up in Orange and Errors will show up in Red.&#10;Warnings can be safely ignored while Errors will prevent continuation." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <Label fx:id="errorText" layoutX="33.0" layoutY="536.0" prefHeight="50.0" prefWidth="481.0" textFill="#cd0000" wrapText="true" />
+      <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
    </children>
 </AnchorPane>

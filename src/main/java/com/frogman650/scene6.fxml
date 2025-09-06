@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
    <children>
@@ -20,6 +21,6 @@
       <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="CNC12 has now been updated.&#10;&#10;Remember that it is the responsibility of the updater to ensure everything works as it should. Take the time to test things out to be sure they're setup as they should be.&#10;&#10;ATCs will need to be re-initialized and for Plasma users the torch will need to be re-calibrated.&#10;&#10;Job files should be copied over if you'd like to keep them. They can be found in C:\old cnc*\ncfiles." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <Label fx:id="errorText" layoutX="33.0" layoutY="536.0" prefHeight="50.0" prefWidth="481.0" textFill="#cd0000" wrapText="true" />
+      <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
    </children>
 </AnchorPane>

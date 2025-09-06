@@ -15,12 +15,12 @@
       <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back" />      <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
       <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Loading I/O continued">
       </Label>
-      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Setting USB-BOB inputs if needed">
+      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Setting USB-BOB inputs">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="385.0" prefWidth="730.0" text="1. Navigate to the &quot;Centroid USB-BOB&quot; section of the wizard.&#10;2. Within the wizard, drag and drop the USB-BOB inputs as you see them in the list below. (Scroll through the list below if you can't see them all)&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;Once all of the inputs are in place move on to the next screen" wrapText="true">
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="385.0" prefWidth="730.0" text="1. Navigate to the 'Centroid USB-BOB' section of the wizard.&#10;2. Within the wizard, drag and drop the USB-BOB inputs as you see them in the list below. (Scroll through the list below if you can't see them all)&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;Once all of the inputs are in place move on to the next screen." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
       <ScrollPane fx:id="scrollPane" layoutX="31.0" layoutY="194.0" prefHeight="273.0" prefWidth="350.0" />
-      <Label fx:id="errorText" layoutX="33.0" layoutY="536.0" prefHeight="50.0" prefWidth="481.0" textFill="#cd0000" wrapText="true" />
+      <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
    </children>
 </AnchorPane>

@@ -170,6 +170,9 @@
       "pattern":"\\Qcom/frogman650/scene3.fxml\\E"
     }, 
     {
+      "pattern":"\\Qcom/frogman650/scene4.fxml\\E"
+    }, 
+    {
       "pattern":"\\Qcom/frogman650/scene5.fxml\\E"
     }, 
     {
@@ -179,6 +182,13 @@
   "bundles":[
     {
       "name":"com.sun.javafx.tk.quantum.QuantumMessagesBundle",
+      "locales":[
+        "", 
+        "und"
+      ]
+    }, 
+    {
+      "name":"com.sun.org.apache.xerces.internal.impl.msg.XMLMessages",
       "locales":["und"]
     }, 
     {
@@ -188,13 +198,17 @@
     {
       "name":"com/sun/glass/ui/win/themes",
       "locales":[
+        "", 
         "en", 
         "und"
       ]
     }, 
     {
       "name":"com/sun/javafx/scene/control/skin/resources/controls",
-      "locales":["und"]
+      "locales":[
+        "", 
+        "und"
+      ]
     }
   ]
 }

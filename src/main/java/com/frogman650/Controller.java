@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Controller implements Initializable {
@@ -23,12 +24,20 @@ public class Controller implements Initializable {
     private Scene scene;
     private Parent root;
     @FXML
-    private Label errorText;
+    private ScrollPane errorText;
     @FXML
     private ScrollPane scrollPane;
 
     public void nextButtonAction(ActionEvent event) {
-        App.exceptionText = "";
+        App.exceptionText.clear();
+        App.warningText.clear();
+        // App.exceptionText.add("fake exception 1\n    " + "htrqwhkjtgreqgnmjkrsdjavklgfrf;'ebla.tg[l,nhtrwkgl;fdabfhgjrtniwhbtrdfmeqikgjvkfdlambkfldmahbrw");
+        // App.exceptionText.add("fake exception 2\n    " + "hytergafbfd");
+        // App.exceptionText.add("fake exception 3");
+        // App.exceptionText.add("fake exception 3");
+        // App.exceptionText.add("fake exception 3");
+        // App.warningText.add("fake warning 1");
+        // App.warningText.add("fake warning 2");
         counter ++;
         if (counter == 4 && !App.usbBobInstalled) {
             counter ++;
@@ -43,12 +52,14 @@ public class Controller implements Initializable {
             App.getOldKeyA();
             App.copyLicense();
             App.createPresetIO();
+            App.setNewBoardSoftwareInfo();
+            App.checkBoards();
+            App.checkKeyA();
+            App.transferParms();
         }
         if (counter == 4) {
         }
         if (counter == 5) {
-            App.checkBoards();
-            App.setNewBoardSoftwareInfo();
         }
         if (counter == 6) {
             App.copyOffsetLibrary();
@@ -67,16 +78,23 @@ public class Controller implements Initializable {
             App.transferWizardSettings();
             App.transferParms();
         }
-        if (App.exceptionText.equals("")) {
+        if (App.exceptionText.isEmpty()) {
             newScene(event, "scene" + counter + ".fxml");
         } else {
-            errorText.setText(App.exceptionText);
+            VBox vBox = new VBox();
+            for (int i = 0; i < App.exceptionText.size(); i++) {
+                Label tempLabel = new Label(i+1 + ". " + App.exceptionText.get(i));
+                tempLabel.setTextFill(Color.RED);
+                vBox.getChildren().add(tempLabel);
+            }
+            errorText.setContent(vBox);
             counter --;
         }
     }
 
     public void backButtonAction(ActionEvent event) {
-        App.exceptionText = "";
+        App.exceptionText.clear();
+        App.warningText.clear();
         if (counter == 5 && !App.usbBobInstalled) {
             counter --;
         }
@@ -90,12 +108,19 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        VBox vBox = new VBox();
+        for (int i = 0; i < App.warningText.size(); i++) {
+            Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
+            tempLabel.setTextFill(Color.ORANGE);
+            vBox.getChildren().add(tempLabel);
+        }
+        errorText.setContent(vBox);
         if (counter == 4) {
-            VBox vBox = new VBox();
+            VBox vBox2 = new VBox();
             for (Map.Entry<String, String> entry : App.usbInputsMap.entrySet()) {
-                vBox.getChildren().add(new Label(entry.getKey() + " " + entry.getValue()));
+                vBox2.getChildren().add(new Label(entry.getKey() + " " + entry.getValue()));
             }
-            scrollPane.setContent(vBox);
+            scrollPane.setContent(vBox2);
         }
     }
 
@@ -108,8 +133,7 @@ public class Controller implements Initializable {
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            App.exceptionText = "Error changing scenes";
-            System.out.println("exception thrown while changing scenes\n" + e);
+            App.exceptionText.add("Error changing scenes\n    " + e);
         }
     }
 }

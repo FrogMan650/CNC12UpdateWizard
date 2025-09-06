@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.control.ScrollPane?>
 
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
    <children>
@@ -17,9 +18,9 @@
       </Label>
       <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Setting inputs and outputs in the wizard">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="1. Start CNC12 and it will first load the new firmware onto the board.&#10;2. After the firmware is installed power cycle the board.&#10;3. Start CNC12.&#10;4. Open the wizard by going to F7 - Utility &gt; F10 Wizard.&#10;5. Navigate to the &quot;Input Definitions&quot; section and find and click the &quot;Advanced I/O Configuration&quot; button.&#10;6. Switch to the Custom tab and select &quot;Previous_IO.&quot;&#10;7. Click the green &quot;Load Preset&quot; button near the bottom of the wizard screen.&#10;8. Select &quot;Yes&quot; to confirm you want to load this I/O preset.&#10;&#10;DO NOT close CNC12 or the wizard yet.&#10;You may now move on to the next screen. " wrapText="true">
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="1. Start CNC12.&#10;2. Open the wizard by going to F7 - Utility > F10 - Wizard.&#10;3. Navigate to the 'Input Definitions' section and find and click the 'Advanced I/O Configuration' button.&#10;4. Switch to the Custom tab and select 'Previous_IO.'&#10;5. Click the green 'Load Preset' button near the bottom of the wizard screen.&#10;6. Select 'Yes' to confirm you want to load this I/O preset.&#10;&#10;DO NOT close CNC12 or the wizard yet.&#10;You may now move on to the next screen. " wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <Label fx:id="errorText" layoutX="33.0" layoutY="536.0" prefHeight="50.0" prefWidth="481.0" textFill="#cd0000" wrapText="true" />
+      <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
    </children>
 </AnchorPane>
