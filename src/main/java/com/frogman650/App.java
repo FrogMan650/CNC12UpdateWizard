@@ -188,6 +188,13 @@ public class App extends Application {
     public static void getIO() {
         try {
             File file = new File("C:/old " + directoryName + "/mpu.plc");
+            Element functionsRootElement = getRootElement(getDocument("C:/"+ directoryName +"/resources/wizard/default/plc/functions.xml"));
+            for (int i = functionsRootElement.getChildNodes().getLength()-1; i >= 0; i--) {
+                if (!functionsRootElement.getChildNodes().item(i).getAttributes().getNamedItem("xsi:type").getNodeValue().equals("UsbInput")) {
+                    functionsRootElement.removeChild(functionsRootElement.getChildNodes().item(i));
+                }
+            }
+            NodeList functionsNodeList = functionsRootElement.getChildNodes();
             Scanner scanner = new Scanner(file);
             String region = "";
             Boolean record = false;
@@ -212,10 +219,20 @@ public class App extends Application {
                     outputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
                 } else if (record && region.equals("usbinputs")) {
                     usbBobInstalled = true;
-                    String lineSplitSV = trimReplaceSplit(line)[1].split("_")[1];
+                    String lineSplitSV = trimReplaceSplit(line)[1];
                     String lineSPlitINP = trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-2] + 
                     trimReplaceSplit(line)[3].split("_")[trimReplaceSplit(line)[3].split("_").length-1];
-                    usbInputsMap.put(lineSPlitINP, lineSplitSV);
+                    for (int i = 0; i < functionsNodeList.getLength(); i++) {
+                        Element nameNode = (Element) functionsNodeList.item(i);
+                        NodeList nameNodeList = nameNode.getElementsByTagName("Name");
+                        NodeList displayNameNodeList = nameNode.getElementsByTagName("DisplayName");
+                        String name = nameNodeList.item(0).getTextContent();
+                        String displayName = displayNameNodeList.item(0).getTextContent();
+                        if (lineSplitSV.equals(name)) {
+                        lineSplitSV = displayName;
+                        usbInputsMap.put(lineSPlitINP, lineSplitSV);
+                        }
+                    }
                 }
             }
             scanner.close();
