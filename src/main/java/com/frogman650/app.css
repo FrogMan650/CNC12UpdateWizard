@@ -27,3 +27,7 @@
 #nextButton, #cancelButton, #backButton, #finishButton {
     -fx-font-size: 15px;
 }
+
+#keyALabel, #boardLabel, #versionLabel {
+    -fx-font-size: 10px;
+}

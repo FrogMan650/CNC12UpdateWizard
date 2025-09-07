@@ -27,17 +27,17 @@ public class Controller implements Initializable {
     private ScrollPane errorText;
     @FXML
     private ScrollPane scrollPane;
+    @FXML
+    private Label keyALabel;
+    @FXML
+    private Label boardLabel;
+    @FXML
+    private Label versionLabel;
 
     public void nextButtonAction(ActionEvent event) {
         App.exceptionText.clear();
         App.warningText.clear();
-        // App.exceptionText.add("fake exception 1\n    " + "htrqwhkjtgreqgnmjkrsdjavklgfrf;'ebla.tg[l,nhtrwkgl;fdabfhgjrtniwhbtrdfmeqikgjvkfdlambkfldmahbrw");
-        // App.exceptionText.add("fake exception 2\n    " + "hytergafbfd");
-        // App.exceptionText.add("fake exception 3");
-        // App.exceptionText.add("fake exception 3");
-        // App.exceptionText.add("fake exception 3");
-        // App.warningText.add("fake warning 1");
-        // App.warningText.add("fake warning 2");
+        App.successText.clear();
         counter ++;
         if (counter == 4 && !App.usbBobInstalled) {
             counter ++;
@@ -49,13 +49,13 @@ public class Controller implements Initializable {
             App.getOldBoard();
             App.setOldBoardSoftwareInfo();
             App.checkBoardAndVersion();
-            App.getOldKeyA();
+            App.checkBoards();
+            App.checkKeyA();
             App.copyLicense();
             App.createPresetIO();
             App.setNewBoardSoftwareInfo();
-            App.checkBoards();
-            App.checkKeyA();
             App.transferParms();
+            App.transferConfig();
         }
         if (counter == 4) {
         }
@@ -65,18 +65,17 @@ public class Controller implements Initializable {
             App.copyOffsetLibrary();
             App.copyWCS();
             App.copyStats();
-            App.copyHomeFile();
             App.copyToolLibrary();
-            App.copyToolChangeFile();
             App.copyScales();
             App.transferCarouselSettings();
             App.transferRackMount();
             App.transferPlasmaConfig();
             App.transferOptions();
-            App.transferConfig();
             App.transferBobConfig();
             App.transferWizardSettings();
             App.transferParms();
+            App.copyHomeFile();
+            App.copyToolChangeFile();
         }
         if (App.exceptionText.isEmpty()) {
             newScene(event, "scene" + counter + ".fxml");
@@ -108,10 +107,20 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        keyALabel.setText(App.newBoardKeyA);
+        boardLabel.setText(App.board);
+        if (counter > 2) {
+            versionLabel.setText(App.oldversionRaw + " -> " + App.newversionRaw);
+        }
         VBox vBox = new VBox();
         for (int i = 0; i < App.warningText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
             tempLabel.setTextFill(Color.ORANGE);
+            vBox.getChildren().add(tempLabel);
+        }
+        for (int i = 0; i < App.successText.size(); i++) {
+            Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
+            tempLabel.setTextFill(Color.GREEN);
             vBox.getChildren().add(tempLabel);
         }
         errorText.setContent(vBox);

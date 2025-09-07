@@ -12,7 +12,8 @@
       <ProgressBar fx:id="progressBar" opacity="0.25" prefHeight="102.0" prefWidth="800.0" progress="0.6" />
       <Button fx:id="nextButton" layoutX="600.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" prefHeight="27.0" prefWidth="70.0" text="Next &gt;" />
       <Button fx:id="cancelButton" cancelButton="true" layoutX="690.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="27.0" prefWidth="70.0" text="Cancel" />
-      <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back" />      <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
+      <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back" />      
+      <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
       <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Loading I/O continued">
       </Label>
       <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Setting USB-BOB inputs">
@@ -22,5 +23,9 @@
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
       <ScrollPane fx:id="scrollPane" layoutX="31.0" layoutY="194.0" prefHeight="273.0" prefWidth="350.0" />
       <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
+      <Label fx:id="boardLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="14.0" prefHeight="17.0" prefWidth="158.0" />
+      <Label fx:id="keyALabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="29.0" prefHeight="17.0" prefWidth="158.0" />
+      <Label fx:id="versionLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="43.0" prefHeight="17.0" prefWidth="158.0" />
+
    </children>
 </AnchorPane>

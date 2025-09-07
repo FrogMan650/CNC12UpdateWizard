@@ -39,14 +39,16 @@ public class App extends Application {
     public static Map<String, String> usbInputsMap = new LinkedHashMap<>();
     public static ArrayList<String> exceptionText = new ArrayList<>();
     public static ArrayList<String> warningText = new ArrayList<>();
-    public static String board;
+    public static ArrayList<String> successText = new ArrayList<>();
+    public static String board = "";
     public static String directoryName = "";
     public static String directoryFiles;
-    public static String oldversionRaw;
-    public static String newversionRaw;
+    public static String oldversionRaw = "";
+    public static String newversionRaw = "";
     public static double oldversionCombined;
     public static double newversionCombined;
-    public static String boardKeyA;
+    public static String oldBoardKeyA = "";
+    public static String newBoardKeyA = "";
     public static Boolean usbBobInstalled = false;
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -83,9 +85,9 @@ public class App extends Application {
                     }
                 }
                 writeToXml("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml", newCfgDocument);
-                System.out.println("Bobconfig *DONE*");
+                successText.add("USB-BOB config transferred");
             } catch (Exception e) {
-                exceptionText.add("Error transfering bob config\n    " + e);
+                exceptionText.add("Error transferring bob config\n    " + e);
             }
         }
     }
@@ -177,7 +179,7 @@ public class App extends Application {
             previousIORootElement.appendChild(inputNode);
             previousIORootElement.appendChild(outputNode);
             writeToXml("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml", previousIODocument);
-            System.out.println("IO preset *DONE*");
+            successText.add("IO preset created");
         } catch (Exception e) {
             exceptionText.add("Error creating IO preset\n    " + e);
         }
@@ -217,7 +219,6 @@ public class App extends Application {
                 }
             }
             scanner.close();
-            System.out.println("Getting IO *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error getting IO\n    " + e);
             }
@@ -231,7 +232,7 @@ public class App extends Application {
             if (toolChangeElement.getAttribute("value").equals("True")) {
                 Files.copy(Paths.get(directoryName.equals("cnct") ? "C:/old " + directoryFiles + "/cnctch.mac" : "C:/old " + directoryFiles + "/mfunc6.mac"), 
                 Paths.get(directoryName.equals("cnct") ? "C:/" + directoryFiles + "/cnctch.mac" : "C:/" + directoryFiles + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Tool change macro *DONE*");
+            successText.add("Tool change macro transferred");
             }
         } catch (Exception e) {
             exceptionText.add("Error copying tool change macro\n    " + e);
@@ -246,7 +247,7 @@ public class App extends Application {
             if (homingElement.getAttribute("value").equals("Custom")) {
                 Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
                 Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Home file *DONE*");
+            successText.add("Homing file transferred");
             }
         } catch (Exception e) {
             exceptionText.add("Error while copying home file\n    " + e);
@@ -267,7 +268,7 @@ public class App extends Application {
                 Element element = (Element) oldParmNode;
                 String text = element.getTextContent();
                 if (i == 64 && !(Double.parseDouble(text) == 0) && oldversionCombined < 540) {
-                    //handle transfering P64 from older versions to P554/555 in newer versions
+                    //handle transferring P64 from older versions to P554/555 in newer versions
                     Double parmValueDouble = Double.parseDouble(text);
                     Double[] oldPairingParam = {64.0, 48.0, 32.0, 16.0, 3.0, 2.0, 1.0};
                     for (int j = 0; j < oldPairingParam.length; j++) {
@@ -281,10 +282,11 @@ public class App extends Application {
                         }
                     }
                 } else if (i == 413) {
-                    if (oldParmNode.getTextContent().equals("1")) {
+                    if (Double.parseDouble(text) == 1) {
                         try {
                             Files.copy(Paths.get("C:/old " + directoryName + "/system/park.mac"), 
                             Paths.get("C:/" + directoryName + "/system/park.mac"), StandardCopyOption.REPLACE_EXISTING);
+                            successText.add("Park file transferred");
                         } catch (Exception e) {
                             exceptionText.add("Error copying park.mac\n    " + e);
                         }
@@ -300,9 +302,9 @@ public class App extends Application {
                 }
             }
             writeToXml("C:/" + directoryName + "/" + directoryFiles + ".prm.xml", newParmDocument);
-            System.out.println("Parameters *DONE*");
+            successText.add("Parameters transferred");
         } catch (Exception e) {
-            exceptionText.add("Error transfering parameters\n    " + e);
+            exceptionText.add("Error transferring parameters\n    " + e);
         }
     }
 
@@ -320,7 +322,6 @@ public class App extends Application {
             for (int i = 0; i < newVersionNodeList.getLength(); i++) {
                 newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
             }
-            System.out.println("Defining params *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error defining parameters\n    " + e);
         }
@@ -351,9 +352,9 @@ public class App extends Application {
                 }
             }
             writeToXml("C:/" + directoryName + "/" + directoryFiles + "cfg.xml", newCfgDocument);
-            System.out.println("Config *DONE*");
+            successText.add("Config settings transferred");
         } catch (Exception e) {
-            exceptionText.add("Error transfering config\n    " + e);
+            exceptionText.add("Error transferring config\n    " + e);
         }
     }
 
@@ -372,9 +373,9 @@ public class App extends Application {
                 }
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
-            System.out.println("Wizard settings *DONE*");
+            successText.add("Wizard settings transferred");
         } catch (Exception e) {
-            exceptionText.add("Error transfering wizard settings\n    " + e);
+            exceptionText.add("Error transferring wizard settings\n    " + e);
         }
     }
 
@@ -394,9 +395,9 @@ public class App extends Application {
                 }
             }
             writeToXml("C:/" + directoryName + "/resources/vcp/options.xml", newOptionsDocument);
-            System.out.println("VCP options *DONE*");
+            successText.add("VCP Options transferred");
         } catch (Exception e) {
-            exceptionText.add("Error transfering VCP options\n    " + e);
+            exceptionText.add("Error transferring VCP options\n    " + e);
         }
     }
 
@@ -407,7 +408,7 @@ public class App extends Application {
             } else {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".tl"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".tl"), StandardCopyOption.REPLACE_EXISTING);
             }
-            System.out.println("Tool library *DONE*");
+            successText.add("Tool library transferred");
         } catch (Exception e) {
             exceptionText.add("Error copying tool library\n    " + e);
         }
@@ -416,7 +417,7 @@ public class App extends Application {
     public static void copyStats() {
         try {
             Files.copy(Paths.get("C:/old "+ directoryName +"/mt.stats"), Paths.get("C:/"+ directoryName +"/mt.stats"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Stats *DONE*");
+            successText.add("Stats transferred");
         } catch (Exception e) {
             exceptionText.add("Error copying stats file\n    " + e);
         }
@@ -427,7 +428,7 @@ public class App extends Application {
         if (file.exists()) {
             try {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/scale_settings.xml"), Paths.get("C:/"+ directoryName +"/scale_settings.xml"), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Scales settings *DONE*");
+            successText.add("Scales settings transferred");
             } catch (Exception e) {
             exceptionText.add("Error copying scales settings\n    " + e);
             }
@@ -437,7 +438,7 @@ public class App extends Application {
     public static void copyWCS() {
         try {
             Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".wcs"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".wcs"), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("WCS *DONE*");
+            successText.add("WCS positions transferred");
         } catch (Exception e) {
             exceptionText.add("Error copying WCS file\n    " + e);
         }
@@ -469,9 +470,9 @@ public class App extends Application {
                     }
                 }
                 writeToXml("C:/" + directoryName + "/RackMountBin.xml", newRackMountDocument);
-                System.out.println("Rack mount settings *DONE*");
+            successText.add("Rack mount settings transferred");
             } catch (Exception e) {
-                exceptionText.add("Error transfering rack mount settings\n    " + e);
+                exceptionText.add("Error transferring rack mount settings\n    " + e);
             }
         }
     }
@@ -501,9 +502,9 @@ public class App extends Application {
                     }
                 }
                 writeToXml("C:/" + directoryName + "/PlasmaConfigurations.xml", newPlasmaConfigDocument);
-                System.out.println("Plasma config *DONE*");
+            successText.add("Plasma config settings transferred");
             } catch (Exception e) {
-                exceptionText.add("Error transfering plasma config\n    " + e);
+                exceptionText.add("Error transferring plasma config\n    " + e);
             }
         }
     }
@@ -522,9 +523,9 @@ public class App extends Application {
                     }
                 }
                 writeToXml("C:/" + directoryName + "/FixedCarouselSettings.xml", newCarouselSettingsDocument);
-                System.out.println("Carousel settings *DONE*");
+            successText.add("Carousel settings transferred");
             } catch (Exception e) {
-                exceptionText.add("Error transfering carousel settings\n    " + e);
+                exceptionText.add("Error transferring carousel settings\n    " + e);
             }
         }
     }
@@ -533,7 +534,7 @@ public class App extends Application {
         if (!directoryName.equals("cnct")) {
             try {
                 Files.copy(Paths.get("C:/old "+ directoryName +"/"+ directoryFiles +".ol"), Paths.get("C:/"+ directoryName +"/"+ directoryFiles +".ol"), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("Offset library *DONE*");
+                successText.add("Offset library transferred");
             } catch (Exception e) {
             exceptionText.add("Error copying offset library\n    " + e);
             }
@@ -543,10 +544,16 @@ public class App extends Application {
     public static void copyLicense() {
         try {
             File file = new File("C:/old "+ directoryName +"/license.dat");
-            if (file.exists()) {
+            if (file.exists() && (newBoardKeyA.equals(oldBoardKeyA))) {
             Files.copy(Paths.get("C:/old "+ directoryName +"/license.dat"), Paths.get("C:/"+ directoryName +"/license.dat"), StandardCopyOption.REPLACE_EXISTING);
+            successText.add("License transferred");
+            return;
             }
-            System.out.println("License *DONE*");
+            if (!newBoardKeyA.equals(oldBoardKeyA)) {
+                warningText.add("License not transferred: KeyA mismatch");
+            } else {
+                warningText.add("License not found");
+            }
         } catch (Exception e) {
             exceptionText.add("Error copying license\n    " + e);
         }
@@ -556,7 +563,6 @@ public class App extends Application {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
             oldversionCombined = getVersionCombined(oldversionRaw);
-            System.out.println("Old software info *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error setting old software version\n    " + e);
         }
@@ -569,7 +575,6 @@ public class App extends Application {
             if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
                 newversionCombined = 540;
             }
-            System.out.println("New software info *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error setting new software version\n    " + e);
         }
@@ -607,7 +612,6 @@ public class App extends Application {
             exceptionText.add("No directory combination found");
         }
         directoryFiles = directoryName.equals("cnct") ? "cnct" : "cncm";
-        System.out.println("Directory name *DONE*");
     }
 
     public static void getOldKeyA() {
@@ -616,32 +620,32 @@ public class App extends Application {
         try {
             keyA = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
-            boardKeyA = keyASplit[keyASplit.length-1];
-            System.out.println("Old KeyA *DONE*");
+            oldBoardKeyA = keyASplit[keyASplit.length-1];
         } catch (Exception e) {
             exceptionText.add("Error getting old KeyA\n    " + e);
         }
     }
 
-    public static String getNewKeyA() {
+    public static void getNewKeyA() {
         String keyA;
         String[] keyASplit = null;
         try {
             keyA = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
-            System.out.println("New KeyA *DONE*");
+            newBoardKeyA = keyASplit[keyASplit.length-1];
         } catch (Exception e) {
             exceptionText.add("Error getting new KeyA\n    " + e);
         }
-        return keyASplit[keyASplit.length-1];
     }
 
-    public static void checkKeyA() {
+    public static Boolean checkKeyA() {
         getOldKeyA();
-        String newKeyA = getNewKeyA();
-        if (!boardKeyA.equals(newKeyA)) {
-            warningText.add("KeyA mismatch: " + boardKeyA + " and " + newKeyA);
+        getNewKeyA();
+        if (!oldBoardKeyA.equals(newBoardKeyA)) {
+            warningText.add("KeyA mismatch: " + oldBoardKeyA + " and " + newBoardKeyA);
+            return false;
         }
+        return true;
     }
 
     public static Element trimEmptyElements(Element node) {
@@ -755,7 +759,6 @@ public class App extends Application {
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             oldBoard = boardVersion.split("_")[2];
             board = oldBoard;
-            System.out.println("Old board type *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error getting old board type\n    " + e);
         }
@@ -770,7 +773,6 @@ public class App extends Application {
             boardVersionNodeList = getRootElement(getDocument(newFilePath)).getElementsByTagName("PLCDeviceID");
             boardVersion = boardVersionNodeList.item(0).getTextContent();
             newBoard = boardVersion.split("_")[2];
-            System.out.println("New board type *DONE*");
         } catch (Exception e) {
             exceptionText.add("Error getting new board type\n    " + e);
         }
