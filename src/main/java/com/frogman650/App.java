@@ -247,8 +247,8 @@ public class App extends Application {
             Node toolChangeFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("CustomToolChangeMacro").item(0);
             Element toolChangeElement = (Element) toolChangeFileNode;
             if (toolChangeElement.getAttribute("value").equals("True")) {
-                Files.copy(Paths.get(directoryName.equals("cnct") ? "C:/old " + directoryFiles + "/cnctch.mac" : "C:/old " + directoryFiles + "/mfunc6.mac"), 
-                Paths.get(directoryName.equals("cnct") ? "C:/" + directoryFiles + "/cnctch.mac" : "C:/" + directoryFiles + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(Paths.get(directoryName.equals("cnct") ? "C:/old " + directoryName + "/cnctch.mac" : "C:/old " + directoryName + "/mfunc6.mac"), 
+                Paths.get(directoryName.equals("cnct") ? "C:/" + directoryName + "/cnctch.mac" : "C:/" + directoryName + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
             successText.add("Tool change macro transferred");
             }
         } catch (Exception e) {

@@ -45,6 +45,7 @@ public class Controller implements Initializable {
         if (counter == 2) {
         }
         if (counter == 3) {
+            App.directoryName = "";
             App.setDirectoryName();
             App.getOldBoard();
             App.setOldBoardSoftwareInfo();
@@ -86,6 +87,16 @@ public class Controller implements Initializable {
                 tempLabel.setTextFill(Color.RED);
                 vBox.getChildren().add(tempLabel);
             }
+            for (int i = 0; i < App.warningText.size(); i++) {
+            Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
+            tempLabel.setTextFill(Color.ORANGE);
+            vBox.getChildren().add(tempLabel);
+            }
+            for (int i = 0; i < App.successText.size(); i++) {
+            Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
+            tempLabel.setTextFill(Color.GREEN);
+            vBox.getChildren().add(tempLabel);
+            }
             errorText.setContent(vBox);
             counter --;
         }
@@ -94,6 +105,7 @@ public class Controller implements Initializable {
     public void backButtonAction(ActionEvent event) {
         App.exceptionText.clear();
         App.warningText.clear();
+        App.successText.clear();
         if (counter == 5 && !App.usbBobInstalled) {
             counter --;
         }
