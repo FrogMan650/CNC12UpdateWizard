@@ -100,7 +100,8 @@ public class App extends Application {
             }
             newFile.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter("C:/"+ directoryName +"/resources/wizard/saved/plcPresets/Previous_IO.xml", true));
-            writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?><IOPreset xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><Name>Previous_IO</Name><IsCustom>true</IsCustom></IOPreset>");
+            writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?><IOPreset xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"" + 
+            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><Name>Previous_IO</Name><IsCustom>true</IsCustom></IOPreset>");
             writer.close();
         } catch (Exception e) {
             exceptionText.add("Error creating preset IO file\n    " + e);
@@ -147,8 +148,7 @@ public class App extends Application {
                     definitionNode.appendChild(isSelectedNode);
                     definitionNode.appendChild(IONumberNode);
                     inputNode.appendChild(definitionNode);
-                }
-                if (outputsMap.containsKey(name)) {
+                } else if (outputsMap.containsKey(name)) {
                     Element definitionNode = previousIODocument.createElement("Definition");
                     Element IONumberNode = previousIODocument.createElement("IONumber");
                     IONumberNode.setTextContent(outputsMap.get(name).split("T")[1]);
@@ -216,7 +216,7 @@ public class App extends Application {
                 } else if (record && region.equals("inputs")) {
                     inputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
                 } else if (record && region.equals("outputs")) {
-                    outputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
+                    outputsMap.put(trimReplaceSplit(line)[1].equals("ChipPumpOut_O") ? "WashDownOut_O" : trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
                 } else if (record && region.equals("usbinputs")) {
                     usbBobInstalled = true;
                     String lineSplitSV = trimReplaceSplit(line)[1];
@@ -261,10 +261,16 @@ public class App extends Application {
             Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
             Node homingFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("HomingFileType").item(0);
             Element homingElement = (Element) homingFileNode;
-            if (homingElement.getAttribute("value").equals("Custom")) {
+            if (oldversionCombined > 510 && homingElement.getAttribute("value").equals("Custom")) {
                 Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
                 Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
-            successText.add("Homing file transferred");
+                successText.add("Homing file transferred");
+            } else if (oldversionCombined < 520 && getOldParamValue(414) == 1) {
+                Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
+                Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Custom");
+                writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
+                successText.add("Homing file transferred");
             }
         } catch (Exception e) {
             exceptionText.add("Error while copying home file\n    " + e);
@@ -298,16 +304,6 @@ public class App extends Application {
                             parmValueDouble -= oldPairingParam[j];
                         }
                     }
-                } else if (i == 413) {
-                    if (Double.parseDouble(text) == 1) {
-                        try {
-                            Files.copy(Paths.get("C:/old " + directoryName + "/system/park.mac"), 
-                            Paths.get("C:/" + directoryName + "/system/park.mac"), StandardCopyOption.REPLACE_EXISTING);
-                            successText.add("Park file transferred");
-                        } catch (Exception e) {
-                            exceptionText.add("Error copying park.mac\n    " + e);
-                        }
-                    }
                 } else if (i == 554) {
                     newParmNode.setTextContent(fourthPairing.toString());
                 } else if (i == 555) {
@@ -323,6 +319,28 @@ public class App extends Application {
         } catch (Exception e) {
             exceptionText.add("Error transferring parameters\n    " + e);
         }
+    }
+
+    public static void copyParkMacro() {
+        if (getOldParamValue(413) == 1) {
+            try {
+                Files.copy(Paths.get("C:/old " + directoryName + "/system/park.mac"), 
+                Paths.get("C:/" + directoryName + "/system/park.mac"), StandardCopyOption.REPLACE_EXISTING);
+                successText.add("Park file transferred");
+            } catch (Exception e) {
+                exceptionText.add("Error copying park.mac\n    " + e);
+            }
+        }
+    }
+
+    public static Double getOldParamValue(int param) {
+        NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
+        return Double.parseDouble(oldParmNodeList.item(param).getTextContent());
+    }
+
+    public static Double getNewParamValue(int param) {
+        NodeList newParmNodeList = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
+        return Double.parseDouble(newParmNodeList.item(param).getTextContent());
     }
 
     public static void defineParams() {

@@ -77,6 +77,7 @@ public class Controller implements Initializable {
             App.transferParms();
             App.copyHomeFile();
             App.copyToolChangeFile();
+            App.copyParkMacro();
         }
         if (App.exceptionText.isEmpty()) {
             newScene(event, "scene" + counter + ".fxml");
