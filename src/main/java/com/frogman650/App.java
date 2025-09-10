@@ -289,28 +289,32 @@ public class App extends Application {
                 Node oldParmNode = oldParmNodeList.item(i);
                 Node newParmNode = newParmNodeList.item(i);
                 Element element = (Element) oldParmNode;
-                String text = element.getTextContent();
-                if (i == 64 && !(Double.parseDouble(text) == 0) && oldversionCombined < 540) {
+                Double parmValue = Double.parseDouble(element.getTextContent());
+                if (i == 64 && parmValue != 0 && oldversionCombined < 540) {
                     //handle transferring P64 from older versions to P554/555 in newer versions
-                    Double parmValueDouble = Double.parseDouble(text);
                     Double[] oldPairingParam = {64.0, 48.0, 32.0, 16.0, 3.0, 2.0, 1.0};
                     for (int j = 0; j < oldPairingParam.length; j++) {
-                        if (parmValueDouble >= oldPairingParam[j]) {
-                            if (parmValueDouble >= 16) {
+                        if (parmValue >= oldPairingParam[j]) {
+                            if (parmValue >= 16) {
                                 fifthPairing = oldPairingParam[j] / 16;
                             } else {
                                 fourthPairing = oldPairingParam[j];
                             }
-                            parmValueDouble -= oldPairingParam[j];
+                            parmValue -= oldPairingParam[j];
                         }
                     }
+                } else if (i == 507 && parmValue != 0) {
+                    if (parmValue < 0) {
+                        parmValue = parmValue * -1;
+                    }
+                    fourthPairing = parmValue;
                 } else if (i == 554) {
                     newParmNode.setTextContent(fourthPairing.toString());
                 } else if (i == 555) {
                     newParmNode.setTextContent(fifthPairing.toString());
                 }
                 if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
-                    newParmNode.setTextContent(text);
+                    newParmNode.setTextContent(parmValue.toString());
                     //newParmNode.setTextContent("69");//for testing
                 }
             }
