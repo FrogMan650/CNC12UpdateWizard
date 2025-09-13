@@ -256,20 +256,39 @@ public class App extends Application {
         }
     }
 
+    public static void setHomingType() {
+        try {
+            Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
+            Node homingFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("HomingFileType").item(0);
+            Node oldCfgNode = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getElementsByTagName("v300_ControlInfo").item(0);
+            String homingTypeValue = oldCfgNode.getAttributes().getNamedItem("v300_HomeAtPowerup").getNodeValue();
+            if (oldversionCombined < 540 && getOldParamValue(5)%2 == 1) {
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("NoHome");
+            } else if (oldversionCombined < 520) {
+                if (getOldParamValue(414) == 1) {
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Custom");
+                } else if (homingTypeValue.equals("0")) {
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Simple");
+                } else if (homingTypeValue.equals("1")) {
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Automatic");
+                } else if (homingTypeValue.equals("2")) {
+                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("ClearPathHardStop");
+                }
+            }
+            writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
+        } catch (Exception e) {
+            exceptionText.add("Error while setting homing type\n    " + e);
+        }
+    }
+
     public static void copyHomeFile() {
         try {
             Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
             Node homingFileNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("HomingFileType").item(0);
             Element homingElement = (Element) homingFileNode;
-            if (oldversionCombined > 510 && homingElement.getAttribute("value").equals("Custom")) {
+            if (homingElement.getAttribute("value").equals("Custom")) {
                 Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
                 Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
-                successText.add("Homing file transferred");
-            } else if (oldversionCombined < 520 && getOldParamValue(414) == 1) {
-                Files.copy(Paths.get("C:/old " + directoryName + "/" + directoryFiles + ".hom"), 
-                Paths.get("C:/" + directoryName + "/" + directoryFiles + ".hom"), StandardCopyOption.REPLACE_EXISTING);
-                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Custom");
-                writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
                 successText.add("Homing file transferred");
             }
         } catch (Exception e) {

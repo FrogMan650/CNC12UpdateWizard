@@ -57,6 +57,8 @@ public class Controller implements Initializable {
             App.setNewBoardSoftwareInfo();
             App.transferParms();
             App.transferConfig();
+            App.transferWizardSettings();
+            App.setHomingType();
         }
         if (counter == 4) {
         }
@@ -73,7 +75,6 @@ public class Controller implements Initializable {
             App.transferPlasmaConfig();
             App.transferOptions();
             App.transferBobConfig();
-            App.transferWizardSettings();
             App.transferParms();
             App.copyHomeFile();
             App.copyToolChangeFile();
