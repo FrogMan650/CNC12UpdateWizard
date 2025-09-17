@@ -249,7 +249,7 @@ public class App extends Application {
             if (toolChangeElement.getAttribute("value").equals("True")) {
                 Files.copy(Paths.get(directoryName.equals("cnct") ? "C:/old " + directoryName + "/cnctch.mac" : "C:/old " + directoryName + "/mfunc6.mac"), 
                 Paths.get(directoryName.equals("cnct") ? "C:/" + directoryName + "/cnctch.mac" : "C:/" + directoryName + "/mfunc6.mac"), StandardCopyOption.REPLACE_EXISTING);
-            successText.add("Tool change macro transferred");
+                successText.add("Tool change macro transferred");
             }
         } catch (Exception e) {
             exceptionText.add("Error copying tool change macro\n    " + e);
@@ -420,7 +420,8 @@ public class App extends Application {
         try {
             Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
             NodeList oldWizardSettingsNodeList = getRootElement(getDocument("C:/old " + directoryName + "/wizardsettings.xml")).getChildNodes();
-            NodeList newWizardSettingsNodeList = getRootElement(newWizardSettingsDocument).getChildNodes();
+            Element newWizardRootElement = getRootElement(newWizardSettingsDocument);
+            NodeList newWizardSettingsNodeList = newWizardRootElement.getChildNodes();
             for (int i = oldWizardSettingsNodeList.getLength()-1; i >= 0; i --) {
                 for (int j = 0; j < newWizardSettingsNodeList.getLength(); j ++) {
                     if (oldWizardSettingsNodeList.item(i).toString().equals(newWizardSettingsNodeList.item(j).toString())) {
@@ -429,6 +430,11 @@ public class App extends Application {
                         element2.setAttribute("value", element.getAttribute("value"));
                     }
                 }
+            }
+            Boolean customToolChangeMacro = newWizardRootElement.getElementsByTagName("CustomToolChangeMacro").item(0).getAttributes()
+            .getNamedItem("value").getNodeValue().equals("True");
+            if (customToolChangeMacro) {
+                newWizardRootElement.getElementsByTagName("ATCWritten").item(0).getAttributes().getNamedItem("value").setNodeValue("True");
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
             successText.add("Wizard settings transferred");
