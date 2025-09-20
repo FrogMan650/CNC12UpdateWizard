@@ -42,16 +42,40 @@ public class App extends Application {
     public static ArrayList<String> successText = new ArrayList<>();
     public static String board = "";
     public static String directoryName = "";
-    public static String directoryFiles;
+    public static String directoryFiles = "";
     public static String oldversionRaw = "";
     public static String newversionRaw = "";
-    public static double oldversionCombined;
-    public static double newversionCombined;
+    public static double oldversionCombined = 0.0;
+    public static double newversionCombined = 0.0;
     public static String oldBoardKeyA = "";
     public static String newBoardKeyA = "";
     public static Boolean usbBobInstalled = false;
     public static void main(String[] args) throws Exception {
         launch(args);
+    }
+
+    public static void resetBoardInfo() {
+        board = "";
+        directoryName = "";
+        directoryFiles = "";
+        oldversionRaw = "";
+        newversionRaw = "";
+        oldversionCombined = 0.0;
+        newversionCombined = 0.0;
+        oldBoardKeyA = "";
+        newBoardKeyA = "";
+        usbBobInstalled = false;
+        inputsMap.clear();
+        outputsMap.clear();
+        usbInputsMap.clear();
+        newParamsToCheck.clear();
+        oldParamsToCheck.clear();
+    }
+
+    public static void resetMessageBox() {
+        exceptionText.clear();
+        warningText.clear();
+        successText.clear();
     }
 
     public static void checkBoardAndVersion() {

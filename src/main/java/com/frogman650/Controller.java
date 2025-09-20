@@ -35,9 +35,7 @@ public class Controller implements Initializable {
     private Label versionLabel;
 
     public void nextButtonAction(ActionEvent event) {
-        App.exceptionText.clear();
-        App.warningText.clear();
-        App.successText.clear();
+        App.resetMessageBox();
         counter ++;
         if (counter == 4 && !App.usbBobInstalled) {
             counter ++;
@@ -45,7 +43,6 @@ public class Controller implements Initializable {
         if (counter == 2) {
         }
         if (counter == 3) {
-            App.directoryName = "";
             App.setDirectoryName();
             App.getOldBoard();
             App.setOldBoardSoftwareInfo();
@@ -106,9 +103,10 @@ public class Controller implements Initializable {
     }
 
     public void backButtonAction(ActionEvent event) {
-        App.exceptionText.clear();
-        App.warningText.clear();
-        App.successText.clear();
+        App.resetMessageBox();
+        if (counter == 3) {
+            App.resetBoardInfo();
+        }
         if (counter == 5 && !App.usbBobInstalled) {
             counter --;
         }
@@ -122,12 +120,21 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        keyALabel.setText(App.newBoardKeyA);
-        boardLabel.setText(App.board);
+        VBox vBox = new VBox();
+        if (counter == 1) {
+            Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
+            exampleError.setTextFill(Color.RED);
+            Label exampleWarning = new Label("1. Example Warning Message\n    Warning messages can generally be safely ignored but you should be aware of them");
+            exampleWarning.setTextFill(Color.ORANGE);
+            Label exampleSuccess = new Label("1. Example Success Message\n    Success messages list settings or files that have been alterred");
+            exampleSuccess.setTextFill(Color.GREEN);
+            vBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
+        }
         if (counter > 2) {
+            keyALabel.setText(App.newBoardKeyA);
+            boardLabel.setText(App.board);
             versionLabel.setText(App.oldversionRaw + " -> " + App.newversionRaw);
         }
-        VBox vBox = new VBox();
         for (int i = 0; i < App.warningText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
             tempLabel.setTextFill(Color.ORANGE);
