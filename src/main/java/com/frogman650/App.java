@@ -461,6 +461,7 @@ public class App extends Application {
                 newWizardRootElement.getElementsByTagName("ATCWritten").item(0).getAttributes().getNamedItem("value").setNodeValue("True");
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
+            setHomingType();
             successText.add("Wizard settings transferred");
         } catch (Exception e) {
             exceptionText.add("Error transferring wizard settings\n    " + e);

@@ -55,7 +55,6 @@ public class Controller implements Initializable {
             App.transferParms();
             App.transferConfig();
             App.transferWizardSettings();
-            App.setHomingType();
         }
         if (counter == 4) {
         }
