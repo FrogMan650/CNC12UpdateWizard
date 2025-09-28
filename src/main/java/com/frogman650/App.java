@@ -238,7 +238,7 @@ public class App extends Application {
                     record = true;
                     region = "usbinputs";
                 } else if (record && region.equals("inputs")) {
-                    inputsMap.put(trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
+                    inputsMap.put(trimReplaceSplit(line)[1].equals("Ohmic_Sensor") ? "OhmicSensor" : trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
                 } else if (record && region.equals("outputs")) {
                     outputsMap.put(trimReplaceSplit(line)[1].equals("ChipPumpOut_O") ? "WashDownOut_O" : trimReplaceSplit(line)[1], trimReplaceSplit(line)[3]);
                 } else if (record && region.equals("usbinputs")) {
@@ -302,6 +302,25 @@ public class App extends Application {
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
         } catch (Exception e) {
             exceptionText.add("Error while setting homing type\n    " + e);
+        }
+    }
+
+    public static void setControlPanelType() {
+        try {
+            Document newWizardSettingsDocument = getDocument("C:/" + directoryName + "/wizardsettings.xml");
+            Node controlPanelNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("VCPorJogPanel").item(0);
+            Node newCfgNode = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getElementsByTagName("v300_ControlInfo").item(0);
+            String controlPanelTypeValue = newCfgNode.getAttributes().getNamedItem("v300_ConsoleType").getNodeValue();
+            if (controlPanelTypeValue.equals("0")) {
+                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("1");
+            } else if (controlPanelTypeValue.equals("2")) {
+                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("0");
+            } else if (controlPanelTypeValue.equals("4")) {
+                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("2");
+            }
+            writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
+        } catch (Exception e) {
+            exceptionText.add("Error while setting control panel type\n    " + e);
         }
     }
 
@@ -391,6 +410,8 @@ public class App extends Application {
     }
 
     public static void defineParams() {
+        newParamsToCheck.clear();
+        oldParamsToCheck.clear();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -425,6 +446,9 @@ public class App extends Application {
                             if (attributes.item(j).getNodeName().equals("v300_ConsoleType") && attributes.item(j).getNodeValue().equals("1")) {
                                 //if console type set to "Legacy" previously, set it to M400/M39 VCP
                                 element2.setAttribute(attributes2.item(k).getNodeName(), "4");
+                            } else if (attributes.item(j).getNodeName().equals("v300_ConsoleType") && getOldParamValue(219) == 0 && oldversionCombined < 540) {
+                                //If VCP was previously off in < 5.40 change panel type to M400/M39
+                                element2.setAttribute(attributes2.item(k).getNodeName(), "0");
                             } else {
                                 element2.setAttribute(attributes2.item(k).getNodeName(), attributes.item(j).getTextContent());
                             }
@@ -462,6 +486,7 @@ public class App extends Application {
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
             setHomingType();
+            setControlPanelType();
             successText.add("Wizard settings transferred");
         } catch (Exception e) {
             exceptionText.add("Error transferring wizard settings\n    " + e);
@@ -543,6 +568,8 @@ public class App extends Application {
                     for (int j = 0; j < newRackMountNodeList.getLength(); j++) {
                         if (oldRackMountNodeList.item(i).getChildNodes().getLength() == 1 && newRackMountNodeList.item(j).getChildNodes().getLength() == 1) {
                             if (oldRackMountNodeList.item(i).getNodeName().equals(newRackMountNodeList.item(j).getNodeName())) {
+                                newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
+                            } else if (oldRackMountNodeList.item(i).getNodeName().equals("Speed")) {
                                 newRackMountNodeList.item(j).setTextContent(oldRackMountNodeList.item(i).getTextContent());
                             }
                         }
