@@ -311,12 +311,14 @@ public class App extends Application {
             Node controlPanelNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("VCPorJogPanel").item(0);
             Node newCfgNode = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getElementsByTagName("v300_ControlInfo").item(0);
             String controlPanelTypeValue = newCfgNode.getAttributes().getNamedItem("v300_ConsoleType").getNodeValue();
-            if (controlPanelTypeValue.equals("0")) {
-                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("1");
-            } else if (controlPanelTypeValue.equals("2")) {
-                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("0");
-            } else if (controlPanelTypeValue.equals("4")) {
-                controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("2");
+            if (board.equals("acorn")) {
+                if (controlPanelTypeValue.equals("0")) {
+                    controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("1");
+                } else if (controlPanelTypeValue.equals("2")) {
+                    controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("0");
+                } else if (controlPanelTypeValue.equals("4")) {
+                    controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("2");
+                }
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
         } catch (Exception e) {
@@ -365,7 +367,7 @@ public class App extends Application {
                             parmValue -= oldPairingParam[j];
                         }
                     }
-                } else if (i == 507 && parmValue != 0) {
+                } else if (i == 507 && parmValue != 0 && board.equals("acorn")) {
                     if (parmValue < 0) {
                         parmValue = parmValue * -1;
                     }

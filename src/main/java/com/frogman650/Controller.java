@@ -72,7 +72,7 @@ public class Controller implements Initializable {
             App.transferOptions();
             App.transferBobConfig();
             App.transferParms();
-            App.transferWizardSettings();
+            //App.transferWizardSettings();
             App.copyHomeFile();
             App.copyToolChangeFile();
             App.copyParkMacro();
