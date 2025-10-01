@@ -681,6 +681,7 @@ public class App extends Application {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
             oldversionCombined = getVersionCombined(oldversionRaw);
+            System.out.println(oldversionCombined);
         } catch (Exception e) {
             exceptionText.add("Error setting old software version\n    " + e);
         }
@@ -690,9 +691,7 @@ public class App extends Application {
         try {
             newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             newversionCombined = getVersionCombined(newversionRaw);
-            if (newversionCombined > 538 && newversionCombined < 540) {//for testing only; rounds up v5.39 to 5.40
-                newversionCombined = 540;
-            }
+            System.out.println(newversionCombined);
         } catch (Exception e) {
             exceptionText.add("Error setting new software version\n    " + e);
         }
@@ -860,11 +859,11 @@ public class App extends Application {
         } catch (Exception e) {
             exceptionText.add("Error getting combined version\n    " + e);
         }
-        if (versionSplitSplit.length == 2) {
-            return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
-        } else {
-            return Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1] + "." + versionSplitSplit[2]);
+        double versionCombined = Double.parseDouble(versionSplitSplit[0] + versionSplitSplit[1]);
+        if (versionCombined == 539) {//For beta testing of 5.39
+            return 540.0;
         }
+        return Math.floor(versionCombined / 10) * 10;
     }
 
     public static void getOldBoard() {
