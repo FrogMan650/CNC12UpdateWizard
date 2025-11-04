@@ -204,7 +204,14 @@
   "name":"javafx.scene.control.ScrollPane",
   "queryAllDeclaredMethods":true,
   "queryAllPublicConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setHbarPolicy","parameterTypes":["javafx.scene.control.ScrollPane$ScrollBarPolicy"] }
+  ]
+},
+{
+  "name":"javafx.scene.control.ScrollPane$ScrollBarPolicy",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"javafx.scene.effect.Effect"

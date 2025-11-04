@@ -120,13 +120,17 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         VBox vBox = new VBox();
+        vBox.setMaxWidth(515);
         if (counter == 1) {
             Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
             exampleError.setTextFill(Color.RED);
+            exampleError.setWrapText(true);
             Label exampleWarning = new Label("1. Example Warning Message\n    Warning messages can generally be safely ignored but you should be aware of them");
             exampleWarning.setTextFill(Color.ORANGE);
+            exampleWarning.setWrapText(true);
             Label exampleSuccess = new Label("1. Example Success Message\n    Success messages list settings or files that have been alterred");
             exampleSuccess.setTextFill(Color.GREEN);
+            exampleSuccess.setWrapText(true);
             vBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
         }
         if (counter > 2) {

@@ -18,10 +18,10 @@
       </Label>
       <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Writing wizard settings to the CNC control configuration">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="Now that all of your I/O is loaded, we can now save our changes.&#10;&#10;1. Click the 'Write Settings to CNC Control Configuration' button found in the&#10;    bottom right of the wizard screen.&#10;2. Click 'Yes' to confirm you'd like to write the settings.&#10;3. Click 'OK' to acknowledge the warning about PLC changes.&#10;4. Power cycle the board.&#10;5. Wait for CNC12 to be closed, while the wizard will still be open with the confirmation message on the screen.&#10;6. Before pressing 'OK' to the wizard confirmation message move on to the next screen." wrapText="true">
+      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="377.0" prefWidth="730.0" text="Now that all of your I/O is loaded, we can now save our changes.&#10;&#10;1. Click the 'Write Settings to CNC Control Configuration' button found in the&#10;    bottom right of the wizard screen.&#10;2. Click 'Yes' to confirm you'd like to write the settings.&#10;3. Click 'OK' to acknowledge the warning about PLC changes.&#10;4. Power cycle the board.&#10;5. Wait for CNC12 to be closed and the board to reboot, while the wizard will still&#10;    be open with the confirmation message on the screen.&#10;6. Before pressing 'OK' to the wizard confirmation message move on to the next&#10;    screen." wrapText="true">
       </Label>
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <ScrollPane fx:id="errorText" layoutX="31.0" layoutY="523.0" prefHeight="71.0" prefWidth="484.0" />
+      <ScrollPane fx:id="errorText" hbarPolicy="NEVER" layoutY="516.0" prefHeight="84.0" prefWidth="515.0" />
       <Label fx:id="boardLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="14.0" prefHeight="17.0" prefWidth="158.0" />
       <Label fx:id="keyALabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="29.0" prefHeight="17.0" prefWidth="158.0" />
       <Label fx:id="versionLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="43.0" prefHeight="17.0" prefWidth="158.0" />
