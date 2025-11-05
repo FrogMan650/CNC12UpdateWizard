@@ -10,7 +10,7 @@
     -fx-font-size: 30px;
 }
 
-#secondaryText, #bodyText {
+#secondaryText {
     -fx-font-size: 20px;
 }
 
@@ -19,7 +19,7 @@
     -fx-background-color:"#dedee0";
 }
 
-#scrollPane > .viewport {
+#bodyText > .viewport {
     -fx-font-size: 20px;
     -fx-background-color:"#dedee0";
 }

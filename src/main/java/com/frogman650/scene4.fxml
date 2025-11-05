@@ -18,10 +18,8 @@
       </Label>
       <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Setting USB-BOB inputs">
       </Label>
-      <Label fx:id="bodyText" alignment="TOP_LEFT" layoutX="31.0" layoutY="119.0" prefHeight="385.0" prefWidth="730.0" text="1. Navigate to the 'Centroid USB-BOB' section of the wizard.&#10;2. Within the wizard, drag and drop the USB-BOB inputs as you see them in the&#10;    list below. (Scroll through the list below if you can't see them all)&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;Once all of the inputs are in place move on to the next screen." wrapText="true">
-      </Label>
+      <ScrollPane fx:id="bodyText" hbarPolicy="NEVER" layoutX="33.0" layoutY="119.0" prefHeight="378.0" prefWidth="730.0" />
       <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <ScrollPane fx:id="scrollPane" layoutX="31.0" layoutY="194.0" prefHeight="273.0" prefWidth="350.0" />
       <ScrollPane fx:id="errorText" hbarPolicy="NEVER" layoutY="516.0" prefHeight="84.0" prefWidth="515.0" />
       <Label fx:id="boardLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="14.0" prefHeight="17.0" prefWidth="158.0" />
       <Label fx:id="keyALabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="29.0" prefHeight="17.0" prefWidth="158.0" />

@@ -2,6 +2,7 @@ package com.frogman650;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -26,7 +27,7 @@ public class Controller implements Initializable {
     @FXML
     private ScrollPane errorText;
     @FXML
-    private ScrollPane scrollPane;
+    private ScrollPane bodyText;
     @FXML
     private Label keyALabel;
     @FXML
@@ -80,23 +81,23 @@ public class Controller implements Initializable {
         if (App.exceptionText.isEmpty()) {
             newScene(event, "scene" + counter + ".fxml");
         } else {
-            VBox vBox = new VBox();
+            VBox messageWindowVBox = new VBox();
             for (int i = 0; i < App.exceptionText.size(); i++) {
                 Label tempLabel = new Label(i+1 + ". " + App.exceptionText.get(i));
                 tempLabel.setTextFill(Color.RED);
-                vBox.getChildren().add(tempLabel);
+                messageWindowVBox.getChildren().add(tempLabel);
             }
             for (int i = 0; i < App.warningText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
             tempLabel.setTextFill(Color.ORANGE);
-            vBox.getChildren().add(tempLabel);
+            messageWindowVBox.getChildren().add(tempLabel);
             }
             for (int i = 0; i < App.successText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
             tempLabel.setTextFill(Color.GREEN);
-            vBox.getChildren().add(tempLabel);
+            messageWindowVBox.getChildren().add(tempLabel);
             }
-            errorText.setContent(vBox);
+            errorText.setContent(messageWindowVBox);
             counter --;
         }
     }
@@ -119,9 +120,19 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        VBox vBox = new VBox();
-        vBox.setMaxWidth(515);
+        VBox bodyTextVBox = new VBox();
+        bodyTextVBox.setPrefWidth(730);
+        VBox messageWindowVBox = new VBox();
+        messageWindowVBox.setMaxWidth(515);
+        ArrayList<String> bodyTextArrayList = new ArrayList<>();
         if (counter == 1) {
+            bodyTextArrayList.add("Using this tool you can easily update CNC12 for Acorn, AcornSix, and Hickory " + 
+            "(with wizard) and transfer your settings to the new version. Be mindful that this tool does not set anything" + 
+            " new that is added. It is your responsibility as the updater to familiarize yourself with any changes made " + 
+            "between the old version and new and adjust settings accordingly.");
+            bodyTextArrayList.add("");
+            bodyTextArrayList.add("This tool does not take into account your customized PLC, VCP, Macros, etc.");
+
             Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
             exampleError.setTextFill(Color.RED);
             exampleError.setWrapText(true);
@@ -131,7 +142,57 @@ public class Controller implements Initializable {
             Label exampleSuccess = new Label("1. Example Success Message\n    Success messages list settings or files that have been alterred");
             exampleSuccess.setTextFill(Color.GREEN);
             exampleSuccess.setWrapText(true);
-            vBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
+            messageWindowVBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
+        } else if (counter == 2) {
+            bodyTextArrayList.add("1. We need to rename the current cnc* directory in the C: drive based on the type of machine it is:");
+            bodyTextArrayList.add("Mill = 'old cncm'");
+            bodyTextArrayList.add("Lathe = 'old cnct'");
+            bodyTextArrayList.add("Router = 'old cncr'");
+            bodyTextArrayList.add("Plasma = 'old cncp'");
+            bodyTextArrayList.add("Laser = 'old cncl'");
+            bodyTextArrayList.add("Even if your directory previously was 'cncm,' it needs to be renamed to 'old cncr' if it's a router or 'old cncp' if it's plasma.");
+            bodyTextArrayList.add("2. Download the latest CNC12 installer from the Centroid website and install it.");
+            bodyTextArrayList.add("3. Start CNC12 and it will first update the firmware on the board.");
+            bodyTextArrayList.add("4. After the firmware updates, power cycle the board and restart CNC12.");
+            bodyTextArrayList.add("5. Open the wizard by going to F7 - Utility > F10 - Wizard.");
+            bodyTextArrayList.add("6. Click the 'Write Settings to CNC Control Configuration' button.");
+            bodyTextArrayList.add("7. Click 'Yes' to confirm you'd like to save the settings and follow the prompts.");
+            bodyTextArrayList.add("8. Close CNC12 and move on to the next screen.");
+        } else if (counter == 3) {
+            bodyTextArrayList.add("1. Start CNC12.");
+            bodyTextArrayList.add("2. Your previous License will have been transferred, but if for any reason you need to install a License do that now by going to: F7 - Utility > F8 - CNC12 License > F8 - Import License.");
+            bodyTextArrayList.add("3. Open the wizard by going to F7 - Utility > F10 - Wizard.");
+            bodyTextArrayList.add("4. Navigate to the 'Input Definitions' section and find and click the 'Advanced I/O Configuration' button.");
+            bodyTextArrayList.add("5. Switch to the Custom tab and select 'Previous_IO.'");
+            bodyTextArrayList.add("6. Click the green 'Load Preset' button near the bottom of the wizard screen.");
+            bodyTextArrayList.add("7. Select 'Yes' to confirm you want to load this I/O preset.");
+            bodyTextArrayList.add("");
+            bodyTextArrayList.add("DO NOT close CNC12 or the wizard yet.");
+            bodyTextArrayList.add("You may now move on to the next screen.");
+        } else if (counter == 4) {
+            bodyTextArrayList.add("1. Navigate to the 'Centroid USB-BOB' section of the wizard.");
+            bodyTextArrayList.add("2. Within the wizard, drag and drop the USB-BOB inputs as you see them listed below:");
+            for (Map.Entry<String, String> entry : App.usbInputsMap.entrySet()) {
+                bodyTextArrayList.add(entry.getKey() + " " + entry.getValue());
+            }
+            bodyTextArrayList.add("");
+            bodyTextArrayList.add("Once all of the inputs are in place move on to the next screen.");
+        } else if (counter == 5) {
+            bodyTextArrayList.add("Now that all of your I/O is loaded, we can now save our changes.");
+            bodyTextArrayList.add("1. Click the 'Write Settings to CNC Control Configuration' button found in the bottom right of the wizard screen.");
+            bodyTextArrayList.add("2. Click 'Yes' to confirm you'd like to write the settings.");
+            bodyTextArrayList.add("3. Click 'OK' to acknowledge the warning about PLC changes.");
+            bodyTextArrayList.add("4. Power cycle the board.");
+            bodyTextArrayList.add("5. Wait for CNC12 to be closed and the board to reboot, while the wizard will still be open with the confirmation message on the screen.");
+            bodyTextArrayList.add("6. Before pressing 'OK' to the wizard confirmation message move on to the next screen.");
+        } else if (counter == 6) {
+            bodyTextArrayList.add("To finish the update click 'OK' to the wizard confirmation message.");
+            bodyTextArrayList.add("CNC12 will now restart and the update is compete!");
+            bodyTextArrayList.add("");
+            bodyTextArrayList.add("Remember that it is the responsibility of the updater to ensure everything works correctly. Take the time to test things out to be sure they're setup as they should be.");
+            bodyTextArrayList.add("ATCs will need to be re-initialized and Plasma users will need to re-calibrate the torch.");
+            bodyTextArrayList.add("Job files, custom macros, and VCP modifications should be copied over if you'd like to keep them.");
+            bodyTextArrayList.add("Custom macros may need to be re applied to the Aux keys if they previously were. Do this in the 'VCP Aux Keys' section of the wizard.");
         }
         if (counter > 2) {
             keyALabel.setText(App.newBoardKeyA);
@@ -141,21 +202,20 @@ public class Controller implements Initializable {
         for (int i = 0; i < App.warningText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
             tempLabel.setTextFill(Color.ORANGE);
-            vBox.getChildren().add(tempLabel);
+            messageWindowVBox.getChildren().add(tempLabel);
         }
         for (int i = 0; i < App.successText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
             tempLabel.setTextFill(Color.GREEN);
-            vBox.getChildren().add(tempLabel);
+            messageWindowVBox.getChildren().add(tempLabel);
         }
-        errorText.setContent(vBox);
-        if (counter == 4) {
-            VBox vBox2 = new VBox();
-            for (Map.Entry<String, String> entry : App.usbInputsMap.entrySet()) {
-                vBox2.getChildren().add(new Label(entry.getKey() + " " + entry.getValue()));
+        errorText.setContent(messageWindowVBox);
+        for (int i = 0; i < bodyTextArrayList.size(); i++) {
+                Label tempLabel = new Label(bodyTextArrayList.get(i));
+                tempLabel.setWrapText(true);
+                bodyTextVBox.getChildren().add(tempLabel);
             }
-            scrollPane.setContent(vBox2);
-        }
+        bodyText.setContent(bodyTextVBox);
     }
 
     public void newScene(ActionEvent event, String fxmlScene) {

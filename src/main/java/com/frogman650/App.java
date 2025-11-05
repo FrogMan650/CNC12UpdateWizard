@@ -919,7 +919,7 @@ public class App extends Application {
         
         stage.setTitle("CNC12 Update Wizard");
         stage.getIcons().add(icon);
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.setX(50);
         stage.setY(50);
         stage.setFullScreen(false);
