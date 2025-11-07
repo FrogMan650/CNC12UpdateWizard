@@ -20,7 +20,7 @@
 }
 
 #bodyText > .viewport {
-    -fx-font-size: 20px;
+    /* -fx-font-size: 20px; */
     -fx-background-color:"#dedee0";
 }
 
@@ -30,4 +30,13 @@
 
 #keyALabel, #boardLabel, #versionLabel {
     -fx-font-size: 10px;
+}
+
+#bodyText .scroll-bar:vertical, #bodyText .scroll-bar:vertical .increment-button, #bodyText .scroll-bar:vertical .decrement-button  {
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+}
+
+#bodyText .scroll-bar:vertical {
+    -fx-font-size: 10;
 }

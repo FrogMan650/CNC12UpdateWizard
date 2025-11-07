@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -154,7 +156,7 @@ public class Controller implements Initializable {
         AnchorPane.setRightAnchor(bodyText, 35.0);
         AnchorPane.setBottomAnchor(bodyText, 119.0);
         AnchorPane.setLeftAnchor(bodyText, 35.0);
-        bodyTextVBox.setPadding(new Insets(0, 15, 0, 0));
+        bodyTextVBox.setPadding(new Insets(0, 22, 0, 0));
 
         AnchorPane.setTopAnchor(line, 100.0);
         AnchorPane.setLeftAnchor(line, 35.0);
@@ -170,7 +172,7 @@ public class Controller implements Initializable {
 
         AnchorPane.setRightAnchor(errorText, 285.0);
         AnchorPane.setBottomAnchor(errorText, 0.0);
-        AnchorPane.setLeftAnchor(errorText, 0.0);
+        AnchorPane.setLeftAnchor(errorText, 35.0);
         messageWindowVBox.setPadding(new Insets(0, 15, 0, 0));
 
         AnchorPane.setRightAnchor(cancelButton, 35.0);
@@ -227,7 +229,6 @@ public class Controller implements Initializable {
             for (Map.Entry<String, String> entry : App.usbInputsMap.entrySet()) {
                 bodyTextArrayList.add(entry.getKey() + " " + entry.getValue());
             }
-            bodyTextArrayList.add("");
             bodyTextArrayList.add("Once all of the inputs are in place move on to the next screen.");
         } else if (counter == 5) {
             bodyTextArrayList.add("Now that all of your I/O is loaded, we can now save our changes.");
@@ -286,6 +287,20 @@ public class Controller implements Initializable {
                 bodyTextVBox.getChildren().add(tempLabel);
             }
         bodyText.setContent(bodyTextVBox);
+        String bodyTextStyling = "-fx-font-size: ";
+        int defaultFontSize = 20;
+
+        bodyText.widthProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                bodyText.setStyle(bodyTextStyling + (((((bodyText.getWidth()*bodyText.getHeight())/(378*730))-1)*5)+defaultFontSize) + ";");
+            }
+        });
+        bodyText.heightProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                bodyText.setStyle(bodyTextStyling + (((((bodyText.getWidth()*bodyText.getHeight())/(378*730))-1)*5)+defaultFontSize) + ";");
+
+            }
+        });
     }
 
     public void newScene(ActionEvent event, String fxmlScene) {
