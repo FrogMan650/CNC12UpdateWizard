@@ -681,7 +681,6 @@ public class App extends Application {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
             oldversionCombined = getVersionCombined(oldversionRaw);
-            System.out.println(oldversionCombined);
         } catch (Exception e) {
             exceptionText.add("Error setting old software version\n    " + e);
         }
@@ -691,7 +690,6 @@ public class App extends Application {
         try {
             newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             newversionCombined = getVersionCombined(newversionRaw);
-            System.out.println(newversionCombined);
         } catch (Exception e) {
             exceptionText.add("Error setting new software version\n    " + e);
         }

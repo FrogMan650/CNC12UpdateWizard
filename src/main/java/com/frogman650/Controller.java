@@ -6,17 +6,23 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 public class Controller implements Initializable {
@@ -34,6 +40,22 @@ public class Controller implements Initializable {
     private Label boardLabel;
     @FXML
     private Label versionLabel;
+    @FXML
+    private AnchorPane anchorPane;
+    @FXML
+    private Line line;
+    @FXML
+    private Line line2;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Button nextButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button finishButton;
 
     public void nextButtonAction(ActionEvent event) {
         App.resetMessageBox();
@@ -85,17 +107,20 @@ public class Controller implements Initializable {
             for (int i = 0; i < App.exceptionText.size(); i++) {
                 Label tempLabel = new Label(i+1 + ". " + App.exceptionText.get(i));
                 tempLabel.setTextFill(Color.RED);
+                tempLabel.setWrapText(true);
                 messageWindowVBox.getChildren().add(tempLabel);
             }
             for (int i = 0; i < App.warningText.size(); i++) {
-            Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
-            tempLabel.setTextFill(Color.ORANGE);
-            messageWindowVBox.getChildren().add(tempLabel);
+                Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
+                tempLabel.setTextFill(Color.ORANGE);
+                tempLabel.setWrapText(true);
+                messageWindowVBox.getChildren().add(tempLabel);
             }
             for (int i = 0; i < App.successText.size(); i++) {
-            Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
-            tempLabel.setTextFill(Color.GREEN);
-            messageWindowVBox.getChildren().add(tempLabel);
+                Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
+                tempLabel.setTextFill(Color.GREEN);
+                tempLabel.setWrapText(true);
+                messageWindowVBox.getChildren().add(tempLabel);
             }
             errorText.setContent(messageWindowVBox);
             counter --;
@@ -121,9 +146,36 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         VBox bodyTextVBox = new VBox();
-        bodyTextVBox.setPrefWidth(730);
+        bodyTextVBox.prefWidthProperty().bind(bodyText.widthProperty());
         VBox messageWindowVBox = new VBox();
-        messageWindowVBox.setMaxWidth(515);
+        messageWindowVBox.prefWidthProperty().bind(errorText.widthProperty());
+
+        AnchorPane.setTopAnchor(bodyText, 119.0);
+        AnchorPane.setRightAnchor(bodyText, 35.0);
+        AnchorPane.setBottomAnchor(bodyText, 119.0);
+        AnchorPane.setLeftAnchor(bodyText, 35.0);
+        bodyTextVBox.setPadding(new Insets(0, 15, 0, 0));
+
+        AnchorPane.setTopAnchor(line, 100.0);
+        AnchorPane.setLeftAnchor(line, 35.0);
+        line.endXProperty().bind(Bindings.createDoubleBinding(() -> bodyText.getWidth()+35.0, bodyText.widthProperty()));
+
+        AnchorPane.setBottomAnchor(line2, 100.0);
+        AnchorPane.setLeftAnchor(line2, 35.0);
+        line2.endXProperty().bind(Bindings.createDoubleBinding(() -> bodyText.getWidth()+35.0, bodyText.widthProperty()));
+
+        AnchorPane.setTopAnchor(progressBar, 0.0);
+        AnchorPane.setRightAnchor(progressBar, 0.0);
+        AnchorPane.setLeftAnchor(progressBar, 0.0);
+
+        AnchorPane.setRightAnchor(errorText, 285.0);
+        AnchorPane.setBottomAnchor(errorText, 0.0);
+        AnchorPane.setLeftAnchor(errorText, 0.0);
+        messageWindowVBox.setPadding(new Insets(0, 15, 0, 0));
+
+        AnchorPane.setRightAnchor(cancelButton, 35.0);
+        AnchorPane.setBottomAnchor(cancelButton, 35.0);
+
         ArrayList<String> bodyTextArrayList = new ArrayList<>();
         if (counter == 1) {
             bodyTextArrayList.add("Using this tool you can easily update CNC12 for Acorn, AcornSix, and Hickory " + 
@@ -186,6 +238,8 @@ public class Controller implements Initializable {
             bodyTextArrayList.add("5. Wait for CNC12 to be closed and the board to reboot, while the wizard will still be open with the confirmation message on the screen.");
             bodyTextArrayList.add("6. Before pressing 'OK' to the wizard confirmation message move on to the next screen.");
         } else if (counter == 6) {
+            AnchorPane.setRightAnchor(finishButton, 125.0);
+            AnchorPane.setBottomAnchor(finishButton, 35.0);
             bodyTextArrayList.add("To finish the update click 'OK' to the wizard confirmation message.");
             bodyTextArrayList.add("CNC12 will now restart and the update is compete!");
             bodyTextArrayList.add("");
@@ -194,19 +248,35 @@ public class Controller implements Initializable {
             bodyTextArrayList.add("Job files, custom macros, and VCP modifications should be copied over if you'd like to keep them.");
             bodyTextArrayList.add("Custom macros may need to be re applied to the Aux keys if they previously were. Do this in the 'VCP Aux Keys' section of the wizard.");
         }
+        if (counter > 1) {
+            AnchorPane.setRightAnchor(backButton, 200.0);
+            AnchorPane.setBottomAnchor(backButton, 35.0);
+        }
+        if (counter < 6) {
+            AnchorPane.setRightAnchor(nextButton, 125.0);
+            AnchorPane.setBottomAnchor(nextButton, 35.0);
+        }
         if (counter > 2) {
-            keyALabel.setText(App.newBoardKeyA);
             boardLabel.setText(App.board);
+            AnchorPane.setRightAnchor(boardLabel, 35.0);
+            AnchorPane.setTopAnchor(boardLabel, 15.0);
+            keyALabel.setText(App.newBoardKeyA);
+            AnchorPane.setRightAnchor(keyALabel, 35.0);
+            AnchorPane.setTopAnchor(keyALabel, 30.0);
             versionLabel.setText(App.oldversionRaw + " -> " + App.newversionRaw);
+            AnchorPane.setRightAnchor(versionLabel, 35.0);
+            AnchorPane.setTopAnchor(versionLabel, 45.0);
         }
         for (int i = 0; i < App.warningText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
             tempLabel.setTextFill(Color.ORANGE);
+            tempLabel.setWrapText(true);
             messageWindowVBox.getChildren().add(tempLabel);
         }
         for (int i = 0; i < App.successText.size(); i++) {
             Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
             tempLabel.setTextFill(Color.GREEN);
+            tempLabel.setWrapText(true);
             messageWindowVBox.getChildren().add(tempLabel);
         }
         errorText.setContent(messageWindowVBox);
@@ -222,8 +292,12 @@ public class Controller implements Initializable {
         try {
             root = FXMLLoader.load(getClass().getResource(fxmlScene));
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            double previousWidth = stage.getWidth();
+            double previousHeight = stage.getHeight();
             scene = new Scene(root);
             scene.getStylesheets().add(this.getClass().getResource("app.css").toExternalForm());
+            stage.setWidth(previousWidth);
+            stage.setHeight(previousHeight);
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {

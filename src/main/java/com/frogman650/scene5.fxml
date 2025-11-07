@@ -7,23 +7,20 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 
-<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.frogman650.Controller">
    <children>
-      <ProgressBar fx:id="progressBar" opacity="0.25" prefHeight="102.0" prefWidth="800.0" progress="0.8" />
+      <ProgressBar fx:id="progressBar" opacity="0.25" prefHeight="102.0" prefWidth="800.0" progress="0.2" />
       <Button fx:id="nextButton" layoutX="600.0" layoutY="547.0" mnemonicParsing="false" onAction="#nextButtonAction" prefHeight="27.0" prefWidth="70.0" text="Next &gt;" />
       <Button fx:id="cancelButton" cancelButton="true" layoutX="690.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="27.0" prefWidth="70.0" text="Cancel" />
       <Button fx:id="backButton" layoutX="523.0" layoutY="547.0" mnemonicParsing="false" onAction="#backButtonAction" prefHeight="27.0" prefWidth="70.0" text="&lt; Back" />
-      <Line endX="385.0" layoutX="374.0" layoutY="101.0" startX="-345.0" />
-      <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Loading I/O continued">
-      </Label>
-      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Writing wizard settings to the CNC control configuration">
-      </Label>
+      <Line fx:id="line" layoutX="35.0" layoutY="101.0" startX="35.0" />
+      <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Introduction"></Label>
+      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Welcome to the CNC12 Update wizard!"></Label>
       <ScrollPane fx:id="bodyText" hbarPolicy="NEVER" layoutX="33.0" layoutY="119.0" prefHeight="378.0" prefWidth="730.0" />
-      <Line endX="385.0" layoutX="378.0" layoutY="515.0" startX="-345.0" />
-      <ScrollPane fx:id="errorText" hbarPolicy="NEVER" layoutY="516.0" prefHeight="84.0" prefWidth="515.0" />
+      <Line fx:id="line2" layoutX="35.0" layoutY="515.0" startX="35.0" />
+      <ScrollPane fx:id="errorText" hbarPolicy="NEVER" layoutY="516.0" prefHeight="100.0" prefWidth="515.0" />
       <Label fx:id="boardLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="14.0" prefHeight="17.0" prefWidth="158.0" />
       <Label fx:id="keyALabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="29.0" prefHeight="17.0" prefWidth="158.0" />
       <Label fx:id="versionLabel" alignment="CENTER_RIGHT" layoutX="602.0" layoutY="43.0" prefHeight="17.0" prefWidth="158.0" />
-
    </children>
 </AnchorPane>
