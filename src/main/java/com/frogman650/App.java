@@ -915,7 +915,7 @@ public class App extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add(this.getClass().getResource("app.css").toExternalForm());
         
-        stage.setTitle("CNC12 Update Wizard");
+        stage.setTitle("CNC12 Updater");
         stage.getIcons().add(icon);
         stage.setResizable(true);
         stage.setX(50);

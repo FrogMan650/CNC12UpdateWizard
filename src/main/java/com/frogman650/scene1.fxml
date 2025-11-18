@@ -14,7 +14,7 @@
       <Button fx:id="cancelButton" cancelButton="true" layoutX="690.0" layoutY="547.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="27.0" prefWidth="70.0" text="Cancel" />
       <Line fx:id="line" layoutX="35.0" layoutY="101.0" startX="35.0" />
       <Label fx:id="primaryText" layoutX="31.0" layoutY="14.0" prefHeight="43.0" prefWidth="730.0" text="Introduction"></Label>
-      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Welcome to the CNC12 Update wizard!"></Label>
+      <Label fx:id="secondaryText" layoutX="31.0" layoutY="63.0" prefHeight="17.0" prefWidth="730.0" text="Welcome to the CNC12 Updater!"></Label>
       <ScrollPane fx:id="bodyText" hbarPolicy="NEVER" layoutX="33.0" layoutY="119.0" prefHeight="378.0" prefWidth="730.0" />
       <Line fx:id="line2" layoutX="35.0" layoutY="515.0" startX="35.0" />
       <ScrollPane fx:id="errorText" hbarPolicy="NEVER" layoutY="516.0" prefHeight="100.0" prefWidth="515.0" />

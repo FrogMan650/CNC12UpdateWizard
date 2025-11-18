@@ -149,6 +149,7 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         VBox bodyTextVBox = new VBox();
         bodyTextVBox.prefWidthProperty().bind(bodyText.widthProperty());
+        bodyTextVBox.setSpacing(10);
         VBox messageWindowVBox = new VBox();
         messageWindowVBox.prefWidthProperty().bind(errorText.widthProperty());
 
@@ -184,8 +185,10 @@ public class Controller implements Initializable {
             "(with wizard) and transfer your settings to the new version. Be mindful that this tool does not set anything" + 
             " new that is added. It is your responsibility as the updater to familiarize yourself with any changes made " + 
             "between the old version and new and adjust settings accordingly.");
-            bodyTextArrayList.add("");
+            bodyTextArrayList.add("Tips:");
             bodyTextArrayList.add("This tool does not take into account your customized PLC, VCP, Macros, etc.");
+            bodyTextArrayList.add("Click on steps as you go to mark the text green.");
+            bodyTextArrayList.add("Don't forget to scroll down, there may be more steps you can't see!");
 
             Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
             exampleError.setTextFill(Color.RED);
@@ -198,13 +201,9 @@ public class Controller implements Initializable {
             exampleSuccess.setWrapText(true);
             messageWindowVBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
         } else if (counter == 2) {
-            bodyTextArrayList.add("1. We need to rename the current cnc* directory in the C: drive based on the type of machine it is:");
-            bodyTextArrayList.add("Mill = 'old cncm'");
-            bodyTextArrayList.add("Lathe = 'old cnct'");
-            bodyTextArrayList.add("Router = 'old cncr'");
-            bodyTextArrayList.add("Plasma = 'old cncp'");
-            bodyTextArrayList.add("Laser = 'old cncl'");
-            bodyTextArrayList.add("Even if your directory previously was 'cncm,' it needs to be renamed to 'old cncr' if it's a router or 'old cncp' if it's plasma.");
+            bodyTextArrayList.add("1. We need to rename the current cnc* directory in the C: drive based on the type of machine it is:\n" +
+            "Mill = 'old cncm'\nLathe = 'old cnct'\nRouter = 'old cncr'\nPlasma = 'old cncp'\nLaser = 'old cncl'\nEven if your directory " +
+            "previously was 'cncm,' it needs to be renamed to 'old cncr' if it's a router or 'old cncp' if it's plasma.");
             bodyTextArrayList.add("2. Download the latest CNC12 installer from the Centroid website and install it.");
             bodyTextArrayList.add("3. Start CNC12 and it will first update the firmware on the board.");
             bodyTextArrayList.add("4. After the firmware updates, power cycle the board and restart CNC12.");
@@ -220,7 +219,6 @@ public class Controller implements Initializable {
             bodyTextArrayList.add("5. Switch to the Custom tab and select 'Previous_IO.'");
             bodyTextArrayList.add("6. Click the green 'Load Preset' button near the bottom of the wizard screen.");
             bodyTextArrayList.add("7. Select 'Yes' to confirm you want to load this I/O preset.");
-            bodyTextArrayList.add("");
             bodyTextArrayList.add("DO NOT close CNC12 or the wizard yet.");
             bodyTextArrayList.add("You may now move on to the next screen.");
         } else if (counter == 4) {
@@ -242,8 +240,7 @@ public class Controller implements Initializable {
             AnchorPane.setRightAnchor(finishButton, 125.0);
             AnchorPane.setBottomAnchor(finishButton, 35.0);
             bodyTextArrayList.add("To finish the update click 'OK' to the wizard confirmation message.");
-            bodyTextArrayList.add("CNC12 will now restart and the update is compete!");
-            bodyTextArrayList.add("");
+            bodyTextArrayList.add("CNC12 will now restart and the update is complete!");
             bodyTextArrayList.add("Remember that it is the responsibility of the updater to ensure everything works correctly. Take the time to test things out to be sure they're setup as they should be.");
             bodyTextArrayList.add("ATCs will need to be re-initialized and Plasma users will need to re-calibrate the torch.");
             bodyTextArrayList.add("Job files, custom macros, and VCP modifications should be copied over if you'd like to keep them.");
@@ -283,7 +280,17 @@ public class Controller implements Initializable {
         errorText.setContent(messageWindowVBox);
         for (int i = 0; i < bodyTextArrayList.size(); i++) {
                 Label tempLabel = new Label(bodyTextArrayList.get(i));
-                tempLabel.setWrapText(true);
+                tempLabel.setId("bodyTextLabel");
+                tempLabel.setAccessibleText("0");
+                tempLabel.setOnMouseClicked(event -> {
+                    if (tempLabel.getAccessibleText().equals("0")) {
+                        tempLabel.setAccessibleText("1");
+                        tempLabel.setStyle("-fx-text-fill: green;");
+                    } else {
+                        tempLabel.setAccessibleText("0");
+                        tempLabel.setStyle("-fx-text-fill: black;"); 
+                    }
+                });
                 bodyTextVBox.getChildren().add(tempLabel);
             }
         bodyText.setContent(bodyTextVBox);

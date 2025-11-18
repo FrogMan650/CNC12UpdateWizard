@@ -20,8 +20,12 @@
 }
 
 #bodyText > .viewport {
-    /* -fx-font-size: 20px; */
     -fx-background-color:"#dedee0";
+}
+
+#bodyTextLabel {
+    -fx-wrap-text: true;
+    -fx-cursor: hand;
 }
 
 #nextButton, #cancelButton, #backButton, #finishButton {
