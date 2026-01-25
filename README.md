@@ -1,4 +1,4 @@
-# CNC12 Update Wizard
+# CNC12 Updater
  Windows application to "update" CNC12 to v5.4 from an older version for controls with a wizard.
  <br><br>Works with the following Boards and CNC12 versions:
  <br>Acorn v5.0+ for Mill, Lathe, Router, and Plasma
