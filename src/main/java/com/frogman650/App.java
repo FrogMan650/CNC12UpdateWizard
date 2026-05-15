@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,6 +53,7 @@ public class App extends Application {
     public static String oldBoardKeyA = "";
     public static String newBoardKeyA = "";
     public static Boolean usbBobInstalled = false;
+    public static String updaterVersion = "1.1.2";
     public static void main(String[] args) throws Exception {
         launch(args);
     }
@@ -70,6 +74,35 @@ public class App extends Application {
         usbInputsMap.clear();
         newParamsToCheck.clear();
         oldParamsToCheck.clear();
+    }
+
+    public static void checkForLogFile() {
+        File folder = new File("C:/CNC12 Updater");
+        File file = new File("C:/CNC12 Updater/logs.txt");
+        if (!folder.exists()) {
+            try {
+                Files.createDirectory(folder.toPath());
+            } catch (Exception e) {
+                System.out.println("Error creating CNC12 Updater folder");
+            }
+        }
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                System.out.println("Error creating CNC12 Updater log file");
+            }
+        }
+    }
+
+    public static void addToLogFile(String line) {
+        checkForLogFile();
+        File file = new File("C:/CNC12 Updater/logs.txt");
+        try {
+            Files.writeString(file.toPath(), "\n" + getTimeStamp() + " | " + line, StandardOpenOption.APPEND);
+        } catch (Exception e) {
+            warningText.add("Error writing to log file\n    " + e);
+        }
     }
 
     public static void resetMessageBox() {
@@ -111,7 +144,7 @@ public class App extends Application {
                 writeToXml("C:/" + directoryName + "/" + directoryFiles + ".bobcfg.xml", newCfgDocument);
                 successText.add("USB-BOB config transferred");
             } catch (Exception e) {
-                exceptionText.add("Error transferring bob config\n    " + e);
+                exceptionText.add("Error transferring USB-BOB config\n    " + e);
             }
         }
     }
@@ -681,6 +714,7 @@ public class App extends Application {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
             oldversionCombined = getVersionCombined(oldversionRaw);
+            addToLogFile("Previous version: " + oldversionRaw);
         } catch (Exception e) {
             exceptionText.add("Error setting old software version\n    " + e);
         }
@@ -690,6 +724,7 @@ public class App extends Application {
         try {
             newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             newversionCombined = getVersionCombined(newversionRaw);
+            addToLogFile("Current version: " + newversionRaw);
         } catch (Exception e) {
             exceptionText.add("Error setting new software version\n    " + e);
         }
@@ -736,6 +771,7 @@ public class App extends Application {
             keyA = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
             oldBoardKeyA = keyASplit[keyASplit.length-1];
+            addToLogFile("Previous KeyA: " + oldBoardKeyA);
         } catch (Exception e) {
             exceptionText.add("Error getting old KeyA\n    " + e);
         }
@@ -748,6 +784,7 @@ public class App extends Application {
             keyA = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
             keyASplit = keyA.split(" ");
             newBoardKeyA = keyASplit[keyASplit.length-1];
+            addToLogFile("Current KeyA: " + newBoardKeyA);
         } catch (Exception e) {
             exceptionText.add("Error getting new KeyA\n    " + e);
         }
@@ -898,14 +935,23 @@ public class App extends Application {
         getOldBoard();
         String newBoard = getNewBoard();
         if (!board.equals(newBoard)) {
-            warningText.add("Board mismatch: " + board + " and " + newBoard);
+            exceptionText.add("Board mismatch: " + board + " and " + newBoard);
         }
+        addToLogFile("Previous board: " + board);
+        addToLogFile("Current board: " + newBoard);
     }
 
     public static Boolean checkDirectory(String directory) {
         File firstDirectory = new File("C:/" + directory);
         File secondDirectory = new File("C:/old " + directory);
         return firstDirectory.exists() && secondDirectory.exists();
+    }
+
+    public static String getTimeStamp() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = now.format(formatter);
+        return formattedDate;
     }
 
     @Override
@@ -924,5 +970,6 @@ public class App extends Application {
 
         stage.setScene(scene);
         stage.show();
+        addToLogFile("CNC12 Updater App v" + updaterVersion);
     }
 }

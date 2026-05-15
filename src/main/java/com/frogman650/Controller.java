@@ -71,12 +71,12 @@ public class Controller implements Initializable {
             App.setDirectoryName();
             App.getOldBoard();
             App.setOldBoardSoftwareInfo();
+            App.setNewBoardSoftwareInfo();
             App.checkBoardAndVersion();
             App.checkBoards();
             App.checkKeyA();
             App.copyLicense();
             App.createPresetIO();
-            App.setNewBoardSoftwareInfo();
             App.transferParms();
             App.transferConfig();
             App.transferWizardSettings();
@@ -105,26 +105,7 @@ public class Controller implements Initializable {
         if (App.exceptionText.isEmpty()) {
             newScene(event, "scene" + counter + ".fxml");
         } else {
-            VBox messageWindowVBox = new VBox();
-            for (int i = 0; i < App.exceptionText.size(); i++) {
-                Label tempLabel = new Label(i+1 + ". " + App.exceptionText.get(i));
-                tempLabel.setTextFill(Color.RED);
-                tempLabel.setWrapText(true);
-                messageWindowVBox.getChildren().add(tempLabel);
-            }
-            for (int i = 0; i < App.warningText.size(); i++) {
-                Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
-                tempLabel.setTextFill(Color.ORANGE);
-                tempLabel.setWrapText(true);
-                messageWindowVBox.getChildren().add(tempLabel);
-            }
-            for (int i = 0; i < App.successText.size(); i++) {
-                Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
-                tempLabel.setTextFill(Color.GREEN);
-                tempLabel.setWrapText(true);
-                messageWindowVBox.getChildren().add(tempLabel);
-            }
-            errorText.setContent(messageWindowVBox);
+            setMessageWindowText();
             counter --;
         }
     }
@@ -150,8 +131,6 @@ public class Controller implements Initializable {
         VBox bodyTextVBox = new VBox();
         bodyTextVBox.prefWidthProperty().bind(bodyText.widthProperty());
         bodyTextVBox.setSpacing(10);
-        VBox messageWindowVBox = new VBox();
-        messageWindowVBox.prefWidthProperty().bind(errorText.widthProperty());
 
         AnchorPane.setTopAnchor(bodyText, 119.0);
         AnchorPane.setRightAnchor(bodyText, 35.0);
@@ -174,7 +153,6 @@ public class Controller implements Initializable {
         AnchorPane.setRightAnchor(errorText, 285.0);
         AnchorPane.setBottomAnchor(errorText, 0.0);
         AnchorPane.setLeftAnchor(errorText, 35.0);
-        messageWindowVBox.setPadding(new Insets(0, 15, 0, 0));
 
         AnchorPane.setRightAnchor(cancelButton, 35.0);
         AnchorPane.setBottomAnchor(cancelButton, 35.0);
@@ -189,17 +167,6 @@ public class Controller implements Initializable {
             bodyTextArrayList.add("This tool does not take into account your customized PLC, VCP, Macros, etc.");
             bodyTextArrayList.add("Click on steps as you go to mark the text green.");
             bodyTextArrayList.add("Don't forget to scroll down, there may be more steps you can't see!");
-
-            Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
-            exampleError.setTextFill(Color.RED);
-            exampleError.setWrapText(true);
-            Label exampleWarning = new Label("1. Example Warning Message\n    Warning messages can generally be safely ignored but you should be aware of them");
-            exampleWarning.setTextFill(Color.ORANGE);
-            exampleWarning.setWrapText(true);
-            Label exampleSuccess = new Label("1. Example Success Message\n    Success messages list settings or files that have been alterred");
-            exampleSuccess.setTextFill(Color.GREEN);
-            exampleSuccess.setWrapText(true);
-            messageWindowVBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
         } else if (counter == 2) {
             bodyTextArrayList.add("1. We need to rename the current cnc* directory in the C: drive based on the type of machine it is:\n" +
             "Mill = 'old cncm'\nLathe = 'old cnct'\nRouter = 'old cncr'\nPlasma = 'old cncp'\nLaser = 'old cncl'\nEven if your directory " +
@@ -265,19 +232,7 @@ public class Controller implements Initializable {
             AnchorPane.setRightAnchor(versionLabel, 35.0);
             AnchorPane.setTopAnchor(versionLabel, 45.0);
         }
-        for (int i = 0; i < App.warningText.size(); i++) {
-            Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
-            tempLabel.setTextFill(Color.ORANGE);
-            tempLabel.setWrapText(true);
-            messageWindowVBox.getChildren().add(tempLabel);
-        }
-        for (int i = 0; i < App.successText.size(); i++) {
-            Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
-            tempLabel.setTextFill(Color.GREEN);
-            tempLabel.setWrapText(true);
-            messageWindowVBox.getChildren().add(tempLabel);
-        }
-        errorText.setContent(messageWindowVBox);
+        setMessageWindowText();
         for (int i = 0; i < bodyTextArrayList.size(); i++) {
                 Label tempLabel = new Label(bodyTextArrayList.get(i));
                 tempLabel.setId("bodyTextLabel");
@@ -308,6 +263,47 @@ public class Controller implements Initializable {
 
             }
         });
+    }
+
+    public void setMessageWindowText() {
+        VBox messageWindowVBox = new VBox();
+        messageWindowVBox.prefWidthProperty().bind(errorText.widthProperty());
+        messageWindowVBox.setPadding(new Insets(0, 15, 0, 0));
+        if (counter == 1) {
+            Label exampleError = new Label("1. Example Error Message\n    Error messages will prevent continuation");
+            exampleError.setTextFill(Color.RED);
+            exampleError.setWrapText(true);
+            Label exampleWarning = new Label("1. Example Warning Message\n    Warning messages can generally be safely ignored but you should be aware of them");
+            exampleWarning.setTextFill(Color.ORANGE);
+            exampleWarning.setWrapText(true);
+            Label exampleSuccess = new Label("1. Example Success Message\n    Success messages list settings or files that have been alterred");
+            exampleSuccess.setTextFill(Color.GREEN);
+            exampleSuccess.setWrapText(true);
+            messageWindowVBox.getChildren().addAll(exampleError, exampleWarning, exampleSuccess);
+        } else {
+            for (int i = 0; i < App.exceptionText.size(); i++) {
+                Label tempLabel = new Label(i+1 + ". " + App.exceptionText.get(i));
+                App.addToLogFile(i+1 + ". " + App.exceptionText.get(i));
+                tempLabel.setTextFill(Color.RED);
+                tempLabel.setWrapText(true);
+                messageWindowVBox.getChildren().add(tempLabel);
+            }
+            for (int i = 0; i < App.warningText.size(); i++) {
+                Label tempLabel = new Label(i+1 + ". " + App.warningText.get(i));
+                App.addToLogFile(i+1 + ". " + App.warningText.get(i));
+                tempLabel.setTextFill(Color.ORANGE);
+                tempLabel.setWrapText(true);
+                messageWindowVBox.getChildren().add(tempLabel);
+            }
+            for (int i = 0; i < App.successText.size(); i++) {
+                Label tempLabel = new Label(i+1 + ". " + App.successText.get(i));
+                App.addToLogFile(i+1 + ". " + App.successText.get(i));
+                tempLabel.setTextFill(Color.GREEN);
+                tempLabel.setWrapText(true);
+                messageWindowVBox.getChildren().add(tempLabel);
+            }
+        }
+        errorText.setContent(messageWindowVBox);
     }
 
     public void newScene(ActionEvent event, String fxmlScene) {
