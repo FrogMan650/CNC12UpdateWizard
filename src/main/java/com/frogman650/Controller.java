@@ -97,7 +97,7 @@ public class Controller implements Initializable {
             App.transferOptions();
             App.transferBobConfig();
             App.transferParms();
-            //App.transferWizardSettings();
+            App.copyAbsoluteEncoderPosition();
             App.copyHomeFile();
             App.copyToolChangeFile();
             App.copyParkMacro();

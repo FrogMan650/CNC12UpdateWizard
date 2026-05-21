@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -310,6 +312,21 @@ public class App extends Application {
             }
         } catch (Exception e) {
             exceptionText.add("Error copying tool change macro\n    " + e);
+        }
+    }
+
+    public static void copyAbsoluteEncoderPosition() {
+        try {
+            File oldFile = new File("C:/old " + directoryName + "/_set-absolute-encoder-position-home-offset.txt");
+            File newFile = new File("C:/" + directoryName + "/_set-absolute-encoder-position-home-offset.txt");
+            if (oldFile.exists()) {
+                Files.copy(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                List<String> modifiedLines = Files.lines(newFile.toPath()).map(line -> line.substring(1)).collect(Collectors.toList());
+                Files.write(newFile.toPath(), modifiedLines);
+                successText.add("Absolute encoder positions transferred");
+            }
+        } catch (Exception e) {
+            exceptionText.add("Error copying absolute encoder position file\n    " + e);
         }
     }
 
