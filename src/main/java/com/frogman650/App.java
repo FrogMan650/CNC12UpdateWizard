@@ -1,8 +1,12 @@
 package com.frogman650;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -15,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,7 +61,7 @@ public class App extends Application {
     public static String oldBoardKeyA = "";
     public static String newBoardKeyA = "";
     public static Boolean usbBobInstalled = false;
-    public static String updaterVersion = "1.1.2";
+    public static String updaterVersion = "1.2";
     public static void main(String[] args) throws Exception {
         launch(args);
     }
@@ -392,11 +398,14 @@ public class App extends Application {
     }
 
     public static void transferParms() {
-        defineParams();
         try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
             Document newParmDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
             NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
+            Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
+            NodeList defaultOldParmNodeList = getRootElement(document1).getElementsByTagName("value");
             Double fourthPairing = 0.0;
             Double fifthPairing = 0.0;
             for(int i = 0; i < oldParmNodeList.getLength(); i ++) {
@@ -427,7 +436,7 @@ public class App extends Application {
                 } else if (i == 555) {
                     newParmNode.setTextContent(fifthPairing.toString());
                 }
-                if (oldParamsToCheck.contains(i) && newParamsToCheck.contains(i)) {
+                if (!(oldParmNodeList.item(i).getTextContent().equals(defaultOldParmNodeList.item(i).getTextContent()))) {
                     newParmNode.setTextContent(parmValue.toString());
                     //newParmNode.setTextContent("69");//for testing
                 }
@@ -461,21 +470,21 @@ public class App extends Application {
         return Double.parseDouble(newParmNodeList.item(param).getTextContent());
     }
 
+    @Deprecated
     public static void defineParams() {
         newParamsToCheck.clear();
         oldParamsToCheck.clear();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
+            NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
+            NodeList newParmNodeList = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
             Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
-            Document document2 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(newversionCombined) +".xml"));
-            NodeList oldVersionNodeList = getRootElement(document1).getElementsByTagName("Parameter");
-            NodeList newVersionNodeList = getRootElement(document2).getElementsByTagName("Parameter");
-            for (int i = 0; i < oldVersionNodeList.getLength(); i++) {
-                oldParamsToCheck.add(Integer.parseInt(oldVersionNodeList.item(i).getTextContent()));
-            }
-            for (int i = 0; i < newVersionNodeList.getLength(); i++) {
-                newParamsToCheck.add(Integer.parseInt(newVersionNodeList.item(i).getTextContent()));
+            NodeList defaultOldParmNodeList = getRootElement(document1).getElementsByTagName("value");
+            for (int i = 0; i < oldParmNodeList.getLength(); i++) {
+                if (!(oldParmNodeList.item(i).getTextContent().equals(defaultOldParmNodeList.item(i).getTextContent()))) {
+                    newParmNodeList.item(i).setTextContent(oldParmNodeList.item(i).getTextContent());
+                }
             }
         } catch (Exception e) {
             exceptionText.add("Error defining parameters\n    " + e);
@@ -727,6 +736,7 @@ public class App extends Application {
         }
     }
 
+    @Deprecated
     public static void setOldBoardSoftwareInfo() {
         try {
             oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
@@ -737,6 +747,7 @@ public class App extends Application {
         }
     }
 
+    @Deprecated
     public static void setNewBoardSoftwareInfo() {
         try {
             newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
@@ -781,6 +792,7 @@ public class App extends Application {
         directoryFiles = directoryName.equals("cnct") ? "cnct" : "cncm";
     }
 
+    @Deprecated
     public static void getOldKeyA() {
         String keyA;
         String[] keyASplit = null;
@@ -794,6 +806,7 @@ public class App extends Application {
         }
     }
 
+    @Deprecated
     public static void getNewKeyA() {
         String keyA;
         String[] keyASplit = null;
@@ -808,8 +821,6 @@ public class App extends Application {
     }
 
     public static Boolean checkKeyA() {
-        getOldKeyA();
-        getNewKeyA();
         if (!oldBoardKeyA.equals(newBoardKeyA)) {
             warningText.add("KeyA mismatch: " + oldBoardKeyA + " and " + newBoardKeyA);
             return false;
@@ -886,6 +897,85 @@ public class App extends Application {
         }
     }
 
+    public static void getReportInfo() {
+        try {
+            String oldReportName = "";
+            String oldReportPath = "";
+            String newReportName = "";
+            String newReportPath = "";
+            String oldLicenseInfo = "";
+            String newLicenseInfo = "";
+            String oldVersionInfo = "";
+            String newVersionInfo = "";
+            String oldSerialInfo = "";
+            String newSerialInfo = "";
+
+            // File oldReportBackupFolder = new File("C:/old " + directoryName + "/reportbackup");
+            File oldReportBackupFolder = new File("C:/old cncm/reportbackup");//testing only
+            File [] oldReportBackupList = oldReportBackupFolder.listFiles();
+            if (oldReportBackupList != null) {
+                oldReportName = oldReportBackupList[0].getName().split("\\.")[0];
+                oldReportPath = oldReportBackupList[0].toPath().toString();
+            }
+            // File oldReportBackupFolder = new File("C:/" + directoryName + "/reportbackup");
+            File newReportBackupFolder = new File("C:/cncm/reportbackup");//testing only
+            File [] newReportBackupList = newReportBackupFolder.listFiles();
+            if (newReportBackupList != null) {
+                newReportName = newReportBackupList[0].getName().split("\\.")[0];
+                newReportPath = newReportBackupList[0].toPath().toString();
+            }
+            ZipFile oldZipFile = new ZipFile(oldReportPath);
+            ZipEntry oldEntry = oldZipFile.getEntry(oldReportName + ".txt");
+            if (oldEntry != null && !oldEntry.isDirectory()) {
+                InputStream is = oldZipFile.getInputStream(oldEntry);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                String line;
+                int count = 0;
+                while ((line = reader.readLine()) != null && count < 10) {
+                    count ++;
+                    if (line.contains("License:")) {
+                        oldLicenseInfo = line;
+                    } else if (line.equals("Version:")) {
+                        oldVersionInfo = reader.readLine();
+                    }  else if (line.contains("Version:")) {
+                        oldVersionInfo = line;
+                    } else if (line.contains("serial number:")) {
+                        oldSerialInfo = line;
+                    }
+                }
+                System.out.println(oldSerialInfo);
+                System.out.println(oldVersionInfo);
+                System.out.println(oldLicenseInfo);
+            }
+            ZipFile newZipFile = new ZipFile(newReportPath);
+            ZipEntry newEntry = newZipFile.getEntry(newReportName + ".txt");
+            if (newEntry != null && !newEntry.isDirectory()) {
+                InputStream is = newZipFile.getInputStream(newEntry);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                String line;
+                int count = 0;
+                while ((line = reader.readLine()) != null && count < 10) {
+                    count ++;
+                    if (line.contains("License:")) {
+                        newLicenseInfo = line;
+                    } else if (line.equals("Version:")) {
+                        newVersionInfo = reader.readLine();
+                    }  else if (line.contains("Version:")) {
+                        newVersionInfo = line;
+                    } else if (line.contains("serial number:")) {
+                        newSerialInfo = line;
+                    }
+                }
+                System.out.println(newSerialInfo);
+                System.out.println(newVersionInfo);
+                System.out.println(newLicenseInfo);
+            }
+        } catch (Exception e) {
+            exceptionText.add("Error getting info from report.txt\n    " + e);
+        }
+    }
+
+    @Deprecated
     public static String setRawVersion(String filePath) {
         NodeList softwareVersionNodeList;
         String softwareVersion;
@@ -918,6 +1008,7 @@ public class App extends Application {
         return Math.floor(versionCombined / 10) * 10;
     }
 
+    @Deprecated
     public static void getOldBoard() {
         NodeList boardVersionNodeList;
         String boardVersion;
@@ -933,6 +1024,7 @@ public class App extends Application {
         }
     }
 
+    @Deprecated
     public static String getNewBoard() {
         NodeList boardVersionNodeList;
         String boardVersion;

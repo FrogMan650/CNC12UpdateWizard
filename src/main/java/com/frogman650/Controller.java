@@ -66,6 +66,7 @@ public class Controller implements Initializable {
             counter ++;
         }
         if (counter == 2) {
+            App.getReportInfo();
         }
         if (counter == 3) {
             App.setDirectoryName();
