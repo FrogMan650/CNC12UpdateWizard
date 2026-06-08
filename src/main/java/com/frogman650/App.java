@@ -43,15 +43,16 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class App extends Application {
-    public static ArrayList<Integer> oldParamsToCheck = new ArrayList<>();
-    public static ArrayList<Integer> newParamsToCheck = new ArrayList<>();
     public static Map<String, String> inputsMap = new LinkedHashMap<>();
     public static Map<String, String> outputsMap = new LinkedHashMap<>();
     public static Map<String, String> usbInputsMap = new LinkedHashMap<>();
     public static ArrayList<String> exceptionText = new ArrayList<>();
     public static ArrayList<String> warningText = new ArrayList<>();
     public static ArrayList<String> successText = new ArrayList<>();
-    public static String board = "";
+    public static String oldMachineType = "";
+    public static String newMachineType = "";
+    public static String oldBoard = "";
+    public static String newBoard = "";
     public static String directoryName = "";
     public static String directoryFiles = "";
     public static String oldversionRaw = "";
@@ -67,7 +68,10 @@ public class App extends Application {
     }
 
     public static void resetBoardInfo() {
-        board = "";
+        oldMachineType = "";
+        newMachineType = "";
+        oldBoard = "";
+        newBoard = "";
         directoryName = "";
         directoryFiles = "";
         oldversionRaw = "";
@@ -80,8 +84,6 @@ public class App extends Application {
         inputsMap.clear();
         outputsMap.clear();
         usbInputsMap.clear();
-        newParamsToCheck.clear();
-        oldParamsToCheck.clear();
     }
 
     public static void checkForLogFile() {
@@ -120,13 +122,13 @@ public class App extends Application {
     }
 
     public static void checkBoardAndVersion() {
-        if (board.equals("hickory") && oldversionCombined < 520) {
+        if (newBoard.equals("hickory") && oldversionCombined < 520) {
             exceptionText.add("Hickory updater only available for CNC12 v5.20 and newer");
         }
-        if (board.equals("acorn") && oldversionCombined < 500) {
-            exceptionText.add("Acorn updater only available for CNC12 v5.00 and newer");
+        if (newBoard.equals("acorn") && oldversionCombined < 410) {
+            exceptionText.add("Acorn updater only available for CNC12 v4.10 and newer");
         }
-        if (board.equals("acornsix") && oldversionCombined < 500) {
+        if (newBoard.equals("acornsix") && oldversionCombined < 500) {
             exceptionText.add("AcornSix updater only available for CNC12 v5.00 and newer");
         }
     }
@@ -367,7 +369,7 @@ public class App extends Application {
             Node controlPanelNode = getRootElement(newWizardSettingsDocument).getElementsByTagName("VCPorJogPanel").item(0);
             Node newCfgNode = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getElementsByTagName("v300_ControlInfo").item(0);
             String controlPanelTypeValue = newCfgNode.getAttributes().getNamedItem("v300_ConsoleType").getNodeValue();
-            if (board.equals("acorn")) {
+            if (newBoard.equals("acorn")) {
                 if (controlPanelTypeValue.equals("0")) {
                     controlPanelNode.getAttributes().getNamedItem("value").setNodeValue("1");
                 } else if (controlPanelTypeValue.equals("2")) {
@@ -404,7 +406,7 @@ public class App extends Application {
             Document newParmDocument = getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
             NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
             NodeList newParmNodeList = getRootElement(newParmDocument).getElementsByTagName("value");
-            Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
+            Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + newBoard + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
             NodeList defaultOldParmNodeList = getRootElement(document1).getElementsByTagName("value");
             Double fourthPairing = 0.0;
             Double fifthPairing = 0.0;
@@ -426,7 +428,7 @@ public class App extends Application {
                             parmValue -= oldPairingParam[j];
                         }
                     }
-                } else if (i == 507 && parmValue != 0 && board.equals("acorn")) {
+                } else if (i == 507 && parmValue != 0 && newBoard.equals("acorn")) {
                     if (parmValue < 0) {
                         parmValue = parmValue * -1;
                     }
@@ -468,27 +470,6 @@ public class App extends Application {
     public static Double getNewParamValue(int param) {
         NodeList newParmNodeList = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
         return Double.parseDouble(newParmNodeList.item(param).getTextContent());
-    }
-
-    @Deprecated
-    public static void defineParams() {
-        newParamsToCheck.clear();
-        oldParamsToCheck.clear();
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            NodeList oldParmNodeList = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
-            NodeList newParmNodeList = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + ".prm.xml")).getElementsByTagName("value");
-            Document document1 = builder.parse(App.class.getResourceAsStream("/com/frogman650/" + board + "/" + directoryName + "/" + roundVersion(oldversionCombined) +".xml"));
-            NodeList defaultOldParmNodeList = getRootElement(document1).getElementsByTagName("value");
-            for (int i = 0; i < oldParmNodeList.getLength(); i++) {
-                if (!(oldParmNodeList.item(i).getTextContent().equals(defaultOldParmNodeList.item(i).getTextContent()))) {
-                    newParmNodeList.item(i).setTextContent(oldParmNodeList.item(i).getTextContent());
-                }
-            }
-        } catch (Exception e) {
-            exceptionText.add("Error defining parameters\n    " + e);
-        }
     }
 
     public static void transferConfig() {
@@ -736,28 +717,6 @@ public class App extends Application {
         }
     }
 
-    @Deprecated
-    public static void setOldBoardSoftwareInfo() {
-        try {
-            oldversionRaw = setRawVersion("C:/old " + directoryName + "/" + directoryFiles + ".prm.xml");
-            oldversionCombined = getVersionCombined(oldversionRaw);
-            addToLogFile("Previous version: " + oldversionRaw);
-        } catch (Exception e) {
-            exceptionText.add("Error setting old software version\n    " + e);
-        }
-    }
-
-    @Deprecated
-    public static void setNewBoardSoftwareInfo() {
-        try {
-            newversionRaw = setRawVersion("C:/" + directoryName + "/" + directoryFiles + ".prm.xml");
-            newversionCombined = getVersionCombined(newversionRaw);
-            addToLogFile("Current version: " + newversionRaw);
-        } catch (Exception e) {
-            exceptionText.add("Error setting new software version\n    " + e);
-        }
-    }
-
     public static void setDirectoryName() {
         if (checkDirectory("cncm")) {
             directoryName = "cncm"; 
@@ -790,34 +749,6 @@ public class App extends Application {
             exceptionText.add("No directory combination found");
         }
         directoryFiles = directoryName.equals("cnct") ? "cnct" : "cncm";
-    }
-
-    @Deprecated
-    public static void getOldKeyA() {
-        String keyA;
-        String[] keyASplit = null;
-        try {
-            keyA = getRootElement(getDocument("C:/old " + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
-            keyASplit = keyA.split(" ");
-            oldBoardKeyA = keyASplit[keyASplit.length-1];
-            addToLogFile("Previous KeyA: " + oldBoardKeyA);
-        } catch (Exception e) {
-            exceptionText.add("Error getting old KeyA\n    " + e);
-        }
-    }
-
-    @Deprecated
-    public static void getNewKeyA() {
-        String keyA;
-        String[] keyASplit = null;
-        try {
-            keyA = getRootElement(getDocument("C:/" + directoryName + "/" + directoryFiles + "cfg.xml")).getAttribute("v300_Header").trim();
-            keyASplit = keyA.split(" ");
-            newBoardKeyA = keyASplit[keyASplit.length-1];
-            addToLogFile("Current KeyA: " + newBoardKeyA);
-        } catch (Exception e) {
-            exceptionText.add("Error getting new KeyA\n    " + e);
-        }
     }
 
     public static Boolean checkKeyA() {
@@ -903,22 +834,16 @@ public class App extends Application {
             String oldReportPath = "";
             String newReportName = "";
             String newReportPath = "";
-            String oldLicenseInfo = "";
-            String newLicenseInfo = "";
             String oldVersionInfo = "";
-            String newVersionInfo = "";
-            String oldSerialInfo = "";
-            String newSerialInfo = "";
-
-            // File oldReportBackupFolder = new File("C:/old " + directoryName + "/reportbackup");
-            File oldReportBackupFolder = new File("C:/old cncm/reportbackup");//testing only
+            File oldReportBackupFolder = new File("C:/old " + directoryName + "/reportbackup");
+            // File oldReportBackupFolder = new File("C:/old cncm/reportbackup");//testing only
             File [] oldReportBackupList = oldReportBackupFolder.listFiles();
             if (oldReportBackupList != null) {
                 oldReportName = oldReportBackupList[0].getName().split("\\.")[0];
                 oldReportPath = oldReportBackupList[0].toPath().toString();
             }
-            // File oldReportBackupFolder = new File("C:/" + directoryName + "/reportbackup");
-            File newReportBackupFolder = new File("C:/cncm/reportbackup");//testing only
+            File newReportBackupFolder = new File("C:/" + directoryName + "/reportbackup");
+            // File newReportBackupFolder = new File("C:/cncm/reportbackup");//testing only
             File [] newReportBackupList = newReportBackupFolder.listFiles();
             if (newReportBackupList != null) {
                 newReportName = newReportBackupList[0].getName().split("\\.")[0];
@@ -934,19 +859,29 @@ public class App extends Application {
                 while ((line = reader.readLine()) != null && count < 10) {
                     count ++;
                     if (line.contains("License:")) {
-                        oldLicenseInfo = line;
+                        if (line.toLowerCase().contains("acorn")) {
+                            oldBoard = "Acorn";
+                        } else if (line.toLowerCase().contains("hickory")) {
+                            oldBoard = "Hickory";
+                        } else if (line.toLowerCase().contains("acornsix")) {
+                            oldBoard = "AcornSix";
+                        }
                     } else if (line.equals("Version:")) {
                         oldVersionInfo = reader.readLine();
+                        oldBoard = "Acorn";
                     }  else if (line.contains("Version:")) {
                         oldVersionInfo = line;
                     } else if (line.contains("serial number:")) {
-                        oldSerialInfo = line;
+                        String [] oldSerialInfoSplit = line.split(" ");
+                        oldBoardKeyA = oldSerialInfoSplit[oldSerialInfoSplit.length -1];
                     }
                 }
-                System.out.println(oldSerialInfo);
-                System.out.println(oldVersionInfo);
-                System.out.println(oldLicenseInfo);
+                String [] oldVersionSplit = oldVersionInfo.split(" ");
+                oldversionRaw = oldVersionSplit[oldVersionSplit.length - 1].split("v")[1];
+                oldMachineType = oldVersionSplit[oldVersionSplit.length - 2];
+                oldversionCombined = getVersionCombined(oldversionRaw);
             }
+            oldZipFile.close();
             ZipFile newZipFile = new ZipFile(newReportPath);
             ZipEntry newEntry = newZipFile.getEntry(newReportName + ".txt");
             if (newEntry != null && !newEntry.isDirectory()) {
@@ -957,40 +892,31 @@ public class App extends Application {
                 while ((line = reader.readLine()) != null && count < 10) {
                     count ++;
                     if (line.contains("License:")) {
-                        newLicenseInfo = line;
-                    } else if (line.equals("Version:")) {
-                        newVersionInfo = reader.readLine();
-                    }  else if (line.contains("Version:")) {
-                        newVersionInfo = line;
+                        if (line.toLowerCase().contains("acorn")) {
+                            newBoard = "Acorn";
+                        } else if (line.toLowerCase().contains("hickory")) {
+                            newBoard = "Hickory";
+                        } else if (line.toLowerCase().contains("acornsix")) {
+                            newBoard = "AcornSix";
+                        }
+                    } else if (line.contains("Version:")) {
+                        String [] newVersionSplit = line.split(" ");
+                        newversionRaw = newVersionSplit[newVersionSplit.length - 1].split("v")[1];
+                        newMachineType = newVersionSplit[newVersionSplit.length - 2];
+                        newversionCombined = getVersionCombined(newversionRaw);
                     } else if (line.contains("serial number:")) {
-                        newSerialInfo = line;
+                        String [] newSerialInfoSplit = line.split(" ");
+                        newBoardKeyA = newSerialInfoSplit[newSerialInfoSplit.length -1];
                     }
                 }
-                System.out.println(newSerialInfo);
-                System.out.println(newVersionInfo);
-                System.out.println(newLicenseInfo);
             }
+            newZipFile.close();
+            addToLogFile("Previous info: " + oldBoard + " " + oldMachineType + " v" + oldversionRaw);
+            addToLogFile("Previous KeyA: " + oldBoardKeyA);
+            addToLogFile("Current info: " + newBoard + " " + newMachineType + " v" + newversionRaw);
+            addToLogFile("Current KeyA: " + newBoardKeyA);
         } catch (Exception e) {
             exceptionText.add("Error getting info from report.txt\n    " + e);
-        }
-    }
-
-    @Deprecated
-    public static String setRawVersion(String filePath) {
-        NodeList softwareVersionNodeList;
-        String softwareVersion;
-        String[] softwareVersionSplit = null;
-        try {
-            softwareVersionNodeList = getRootElement(getDocument(filePath)).getElementsByTagName("SoftwareVersion");
-            softwareVersion = softwareVersionNodeList.item(0).getTextContent();
-            softwareVersionSplit = softwareVersion.split(" ");
-        } catch (Exception e) {
-            exceptionText.add("Error setting raw version\n    " + e);
-        }
-        if (softwareVersionSplit[0].equals("ACORN")) {
-            return softwareVersionSplit[3];
-        } else {
-            return softwareVersionSplit[2];
         }
     }
 
@@ -1008,46 +934,10 @@ public class App extends Application {
         return Math.floor(versionCombined / 10) * 10;
     }
 
-    @Deprecated
-    public static void getOldBoard() {
-        NodeList boardVersionNodeList;
-        String boardVersion;
-        String oldBoard = null;
-        String oldFilePath = "C:/old " + directoryName + "/mpu_info.xml";
-        try {
-            boardVersionNodeList = getRootElement(getDocument(oldFilePath)).getElementsByTagName("PLCDeviceID");
-            boardVersion = boardVersionNodeList.item(0).getTextContent();
-            oldBoard = boardVersion.split("_")[2];
-            board = oldBoard;
-        } catch (Exception e) {
-            exceptionText.add("Error getting old board type\n    " + e);
-        }
-    }
-
-    @Deprecated
-    public static String getNewBoard() {
-        NodeList boardVersionNodeList;
-        String boardVersion;
-        String newBoard = null;
-        String newFilePath ="C:/" + directoryName + "/mpu_info.xml";
-        try {
-            boardVersionNodeList = getRootElement(getDocument(newFilePath)).getElementsByTagName("PLCDeviceID");
-            boardVersion = boardVersionNodeList.item(0).getTextContent();
-            newBoard = boardVersion.split("_")[2];
-        } catch (Exception e) {
-            exceptionText.add("Error getting new board type\n    " + e);
-        }
-        return newBoard;
-    }
-
     public static void checkBoards() {
-        getOldBoard();
-        String newBoard = getNewBoard();
-        if (!board.equals(newBoard)) {
-            exceptionText.add("Board mismatch: " + board + " and " + newBoard);
+        if (!newBoard.equals(oldBoard)) {
+            warningText.add("Board mismatch: " + newBoard + " and " + oldBoard);
         }
-        addToLogFile("Previous board: " + board);
-        addToLogFile("Current board: " + newBoard);
     }
 
     public static Boolean checkDirectory(String directory) {

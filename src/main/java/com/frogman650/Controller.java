@@ -66,13 +66,13 @@ public class Controller implements Initializable {
             counter ++;
         }
         if (counter == 2) {
-            App.getReportInfo();
         }
         if (counter == 3) {
             App.setDirectoryName();
-            App.getOldBoard();
-            App.setOldBoardSoftwareInfo();
-            App.setNewBoardSoftwareInfo();
+            App.getReportInfo();
+            // App.getOldBoard();
+            // App.setOldBoardSoftwareInfo();
+            // App.setNewBoardSoftwareInfo();
             App.checkBoardAndVersion();
             App.checkBoards();
             App.checkKeyA();
@@ -223,7 +223,7 @@ public class Controller implements Initializable {
             AnchorPane.setBottomAnchor(nextButton, 35.0);
         }
         if (counter > 2) {
-            boardLabel.setText(App.board);
+            boardLabel.setText(App.newBoard);
             AnchorPane.setRightAnchor(boardLabel, 35.0);
             AnchorPane.setTopAnchor(boardLabel, 15.0);
             keyALabel.setText(App.newBoardKeyA);
