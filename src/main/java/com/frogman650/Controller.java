@@ -70,9 +70,6 @@ public class Controller implements Initializable {
         if (counter == 3) {
             App.setDirectoryName();
             App.getReportInfo();
-            // App.getOldBoard();
-            // App.setOldBoardSoftwareInfo();
-            // App.setNewBoardSoftwareInfo();
             App.checkBoardAndVersion();
             App.checkBoards();
             App.checkKeyA();

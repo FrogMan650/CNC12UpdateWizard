@@ -348,13 +348,13 @@ public class App extends Application {
                 homingFileNode.getAttributes().getNamedItem("value").setNodeValue("NoHome");
             } else if (oldversionCombined < 520) {
                 if (getOldParamValue(414) == 1) {
-                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Custom");
+                    homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Custom");
                 } else if (homingTypeValue.equals("0")) {
-                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Simple");
+                    homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Simple");
                 } else if (homingTypeValue.equals("1")) {
-                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Automatic");
+                    homingFileNode.getAttributes().getNamedItem("value").setNodeValue("Automatic");
                 } else if (homingTypeValue.equals("2")) {
-                homingFileNode.getAttributes().getNamedItem("value").setNodeValue("ClearPathHardStop");
+                    homingFileNode.getAttributes().getNamedItem("value").setNodeValue("ClearPathHardStop");
                 }
             }
             writeToXml("C:/" + directoryName + "/wizardsettings.xml", newWizardSettingsDocument);
@@ -428,13 +428,19 @@ public class App extends Application {
                             parmValue -= oldPairingParam[j];
                         }
                     }
-                } else if (i == 507 && parmValue != 0 && newBoard.equals("acorn")) {
+                //P414 used to be home file type but now it's WMPG sleep rate
+                } else if (i == 414 && oldversionCombined < 540) {
+                    parmValue = 1.0;
+                //axis squaring slave axis set by wizard used to be negative, not anymore
+                }  else if (i == 507 && parmValue != 0) {
                     if (parmValue < 0) {
                         parmValue = parmValue * -1;
                     }
                     fourthPairing = parmValue;
+                //set 4th axis pairing
                 } else if (i == 554) {
                     newParmNode.setTextContent(fourthPairing.toString());
+                //set 5th axis pairing
                 } else if (i == 555) {
                     newParmNode.setTextContent(fifthPairing.toString());
                 }
